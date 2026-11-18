@@ -92,7 +92,7 @@ one-minute answer (at the end of this doc).
 ### Before anyone starts: Nitesh
 
 - [ ] **0.1 Nitesh: create the repo.**
-  - Create `trellis-mvp` on GitHub and add Riya, Nihamika and Mansha as collaborators.
+  - Create `trellis-map` on GitHub and add Riya, Nihamika and Mansha as collaborators.
   - Copy in `docs/` and add `.gitignore`: `node_modules/`, `.env`, `dist/`, `coverage/`.
   - Add `docker-compose.yml` from `nitesh.md` §1.
   - Commit `chore: docs, gitignore and docker compose for postgres` and push to `main`.
@@ -121,7 +121,7 @@ one-minute answer (at the end of this doc).
 - [ ] **0.7 Everyone: get the code and the database.**
 
   ```bash
-  git clone <repo-url> && cd trellis-mvp
+  git clone https://github.com/niteshkumar7557/trellis-map.git && cd trellis-map
   docker compose up -d
   ```
 

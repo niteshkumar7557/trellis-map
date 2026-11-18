@@ -11,7 +11,7 @@ Read all of `docs/design.md` first, especially §6.
 
 ## 1. Before the session
 
-- [ ] Create the GitHub repo `trellis-mvp`, add the three teammates as collaborators, and
+- [ ] Create the GitHub repo `trellis-map`, add the three teammates as collaborators, and
   push these docs.
 - [ ] Add a root `.gitignore`: `node_modules/`, `.env`, `dist/`, `coverage/`.
 - [ ] Add `docker-compose.yml`:

@@ -85,7 +85,7 @@ The backend is split **by feature**, one folder per part. Each person mostly wor
 own folder, so their commits are easy to show and merge conflicts are rare.
 
 ```
-trellis-mvp/
+trellis-map/
 ├── docs/                     # these five docs
 ├── docker-compose.yml        # Postgres for development (Nitesh)
 ├── backend/
