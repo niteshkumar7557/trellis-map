@@ -1,0 +1,14 @@
+# Postgres for development. Everyone runs: docker compose up -d
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: trellis
+      POSTGRES_PASSWORD: trellis
+      POSTGRES_DB: trellis
+    ports:
+      - "5433:5432"     # 5433 on the laptop, so it never clashes with another Postgres
+    volumes:
+      - trellis-db:/var/lib/postgresql/data
+volumes:
+  trellis-db:
