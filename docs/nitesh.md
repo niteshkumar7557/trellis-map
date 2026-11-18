@@ -19,7 +19,7 @@ Read all of `docs/design.md` first, especially §6.
   ```yaml
   services:
     db:
-      image: postgres:16
+      image: postgres:18
       environment:
         POSTGRES_USER: trellis
         POSTGRES_PASSWORD: trellis
@@ -27,7 +27,7 @@ Read all of `docs/design.md` first, especially §6.
       ports:
         - "5433:5432"     # 5433 on the laptop, so it never clashes with another Postgres
       volumes:
-        - trellis-db:/var/lib/postgresql/data
+        - trellis-db:/var/lib/postgresql   # Postgres 18 keeps its data under this folder
   volumes:
     trellis-db:
   ```

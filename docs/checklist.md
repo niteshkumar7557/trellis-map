@@ -91,14 +91,14 @@ one-minute answer (at the end of this doc).
 
 ### Before anyone starts: Nitesh
 
-- [ ] **0.1 Nitesh: create the repo.**
+- [x] **0.1 Nitesh: create the repo.**
   - Create `trellis-map` on GitHub and add Riya, Nihamika and Mansha as collaborators.
   - Copy in `docs/` and add `.gitignore`: `node_modules/`, `.env`, `dist/`, `coverage/`.
   - Add `docker-compose.yml` from `nitesh.md` §1.
   - Commit `chore: docs, gitignore and docker compose for postgres` and push to `main`.
-- [ ] **0.2 Nitesh: Google credentials.** Follow `nitesh.md` §1 ("Google credentials").
+- [x] **0.2 Nitesh: Google credentials.** Follow `nitesh.md` §1 ("Google credentials").
   Add every teammate's Gmail as a **test user**.
-- [ ] **0.3 Nitesh: Groq key and JWT secret.**
+- [x] **0.3 Nitesh: Groq key and JWT secret.**
   - Make a key at console.groq.com.
   - Make the JWT secret with
     `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`.
@@ -125,7 +125,7 @@ one-minute answer (at the end of this doc).
   docker compose up -d
   ```
 
-  **Check:** `docker ps` shows a `postgres:16` container.
+  **Check:** `docker ps` shows a `postgres:18` container.
 
 ### Nihamika: Part 1, the foundation (do this first; everyone waits on it)
 

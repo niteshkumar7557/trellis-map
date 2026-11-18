@@ -71,7 +71,7 @@ If code and docs disagree, fix one of them in the same change.
 
 - [x] All docs written and approved by Nitesh.
 - [x] Repo created locally and pushed to https://github.com/niteshkumar7557/trellis-map
-  (`main`). It contains `docs/`, `.gitignore` and `docker-compose.yml` (Postgres 16 on
+  (`main`). It contains `docs/`, `.gitignore` and `docker-compose.yml` (Postgres 18 on
   port 5433).
 
 **Not started. No code exists yet.**
@@ -80,10 +80,10 @@ If code and docs disagree, fix one of them in the same change.
 
 **Nitesh, before the session (checklist step 0):**
 
-- [ ] 0.1: add Riya, Nihamika and Mansha as collaborators on GitHub.
-- [ ] 0.2: Google OAuth credentials, with every teammate's Gmail and the demo account as
+- [x] 0.1: add Riya, Nihamika and Mansha as collaborators on GitHub.
+- [x] 0.2: Google OAuth credentials, with every teammate's Gmail and the demo account as
   **test users**. The redirect URI is `http://localhost:5173/api/auth/google/callback`.
-- [ ] 0.3: a Groq API key and a `JWT_ACCESS_SECRET`.
+- [x] 0.3: a Groq API key and a `JWT_ACCESS_SECRET`.
 - [ ] 0.4: send each teammate the filled-in `.env` privately.
 
 **Day 1 (18 Nov):**
