@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---- Part 1 (Nihamika) ----
+model Subject {
+  id          Int     @id @default(autoincrement())
+  slug        String  @unique            // "javascript"
+  name        String
+  description String
+  topics      Topic[]
+}
+
+model Topic {
+  id        Int      @id @default(autoincrement())
+  subjectId Int
+  subject   Subject  @relation(fields: [subjectId], references: [id])
+  slug      String                         // "closures"; stable key for the seed
+  name      String
+  summary   String                         // one line: what the topic covers
+  mistakes  String[]                       // common mistakes; Postgres supports arrays
+  needs     TopicPrerequisite[] @relation("TopicNeeds")
+  neededBy  TopicPrerequisite[] @relation("TopicNeededBy")
+
+  @@unique([subjectId, slug])
+}
+
+// "topic needs prerequisite". A join table, because a topic can need many topics
+// and be needed by many.
+model TopicPrerequisite {
+  topicId        Int
+  prerequisiteId Int
+  topic          Topic @relation("TopicNeeds",    fields: [topicId],        references: [id], onDelete: Cascade)
+  prerequisite   Topic @relation("TopicNeededBy", fields: [prerequisiteId], references: [id], onDelete: Cascade)
+
+  @@id([topicId, prerequisiteId])
+}
