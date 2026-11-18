@@ -40,3 +40,18 @@ model TopicPrerequisite {
 
   @@id([topicId, prerequisiteId])
 }
+
+// ---- Part 2 (Riya) ----
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  name         String
+  passwordHash String?                    // null for people who only use Google
+  role         Role     @default(STUDENT)
+  createdAt    DateTime @default(now())
+}
