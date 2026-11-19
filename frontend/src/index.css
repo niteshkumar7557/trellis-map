@@ -1,0 +1,115 @@
+:root {
+  --text: #1f2328;
+  --muted: #656d76;
+  --bg: #f6f7f9;
+  --card: #ffffff;
+  --border: #d0d7de;
+  --accent: #1f6f43;
+  --error: #b42318;
+  font: 16px/1.5 system-ui, "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+a {
+  color: var(--accent);
+}
+
+.center {
+  max-width: 40rem;
+  margin: 3rem auto;
+  padding: 0 1rem;
+  text-align: center;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.error {
+  color: var(--error);
+  margin: 0;
+}
+
+/* Login and Sign up */
+.auth {
+  max-width: 22rem;
+  margin: 4rem auto;
+  padding: 2rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.auth h1 {
+  margin: 0;
+}
+
+.auth form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.auth label {
+  display: grid;
+  gap: 0.25rem;
+  font-weight: 500;
+}
+
+input {
+  font: inherit;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+button {
+  font: inherit;
+  padding: 0.5rem;
+  border: 0;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+}
+
+button.link {
+  background: none;
+  color: var(--accent);
+  padding: 0 0 0 1rem;
+  text-decoration: underline;
+}
+
+.google {
+  display: block;
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  text-align: center;
+  text-decoration: none;
+  color: var(--text);
+}
+
+/* The header on signed-in screens */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}

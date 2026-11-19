@@ -102,15 +102,15 @@ one-minute answer (at the end of this doc).
   - Make a key at console.groq.com.
   - Make the JWT secret with
     `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`.
-- [ ] **0.4 Nitesh: send the `.env` privately** to each teammate, one-to-one (not a group,
+- [x] **0.4 Nitesh: send the `.env` privately** to each teammate, one-to-one (not a group,
   not GitHub). Fill in the template from `design.md` §10.
 
 ### Everyone: set up your laptop (15 minutes)
 
-- [ ] **0.5 Everyone: install the tools.** Node 20 or newer (`node -v` shows `v20` or
+- [x] **0.5 Everyone: install the tools.** Node 20 or newer (`node -v` shows `v20` or
   higher), git, and Docker Desktop. Without Docker, make a free database at neon.tech and
   use its URL in `.env`.
-- [ ] **0.6 Everyone: set your git name.** Use your GitHub account's email, or your commits
+- [x] **0.6 Everyone: set your git name.** Use your GitHub account's email, or your commits
   won't show as yours.
 
   ```bash
@@ -118,7 +118,7 @@ one-minute answer (at the end of this doc).
   git config --global user.email "the-email-on-your-github-account"
   ```
 
-- [ ] **0.7 Everyone: get the code and the database.**
+- [x] **0.7 Everyone: get the code and the database.**
 
   ```bash
   git clone https://github.com/niteshkumar7557/trellis-map.git && cd trellis-map
@@ -129,7 +129,7 @@ one-minute answer (at the end of this doc).
 
 ### Nihamika: Part 1, the foundation (do this first; everyone waits on it)
 
-- [ ] **1.1 Nihamika: the backend project.**
+- [x] **1.1 Nihamika: the backend project.**
   - Run the two `npm install` lines and set up `package.json` exactly as in `nihamika.md`
     step 1.
   - Put the `.env` from Nitesh in `backend/.env`.
@@ -143,7 +143,7 @@ one-minute answer (at the end of this doc).
   **Check:** `cat backend/package.json` shows `"type": "module"` and the six scripts.
   **Commit:** `chore: set up backend package`
 
-- [ ] **1.2 Nihamika: the app, the server and the error handling.**
+- [x] **1.2 Nihamika: the app, the server and the error handling.**
 
   Prompt:
   ```
@@ -158,7 +158,7 @@ one-minute answer (at the end of this doc).
   `curl http://localhost:4000/api/anything` shows `{"error":{"message":"Not found"}}`.
   **Commit:** `chore: set up express app and error handling`
 
-- [ ] **1.3 Nihamika: Prisma and the topic models.**
+- [x] **1.3 Nihamika: Prisma and the topic models.**
   - Run `npx prisma init`. Keep your `.env`; if Prisma overwrote it, paste Nitesh's
     values back in.
 
@@ -173,12 +173,12 @@ one-minute answer (at the end of this doc).
   sync with your schema."
   **Commit:** `feat(topics): add subject and topic models`
 
-- [ ] **1.4 Nihamika: push and open a PR.** Tell Nitesh to merge it. **Gate A is open.**
+- [x] **1.4 Nihamika: push and open a PR.** Tell Nitesh to merge it. **Gate A is open.**
   Tell the team.
 
 ### Riya: Part 2, the start (after gate A)
 
-- [ ] **2.1 Riya: the `User` model.** Run `git checkout main && git pull`, then
+- [x] **2.1 Riya: the `User` model.** Run `git checkout main && git pull`, then
   `git checkout -b part-2-auth`. Then run `npm install bcrypt jsonwebtoken express-rate-limit`
   in `backend/`.
 
@@ -191,7 +191,7 @@ one-minute answer (at the end of this doc).
   **Check:** `npx prisma migrate dev --name users` ends with "in sync".
   **Commit:** `feat(auth): add user model with role`
 
-- [ ] **2.2 Riya: passwords, with the test first.**
+- [x] **2.2 Riya: passwords, with the test first.**
 
   Prompt:
   ```
@@ -202,7 +202,7 @@ one-minute answer (at the end of this doc).
   **Check:** `npx vitest run src/auth/password.test.js` shows **3 passed**.
   **Commit:** `feat(auth): hash and check passwords with bcrypt`
 
-- [ ] **2.3 Riya: access tokens, with the test first.**
+- [x] **2.3 Riya: access tokens, with the test first.**
 
   Prompt:
   ```
@@ -216,7 +216,7 @@ one-minute answer (at the end of this doc).
 
 ### Mansha: Part 4, the plain functions (after gate A; no database needed)
 
-- [ ] **4.1 Mansha: `findNextTopic`, with the test first.** Run
+- [x] **4.1 Mansha: `findNextTopic`, with the test first.** Run
   `git checkout main && git pull`, then `git checkout -b part-4-progress`.
 
   Prompt:
@@ -230,7 +230,7 @@ one-minute answer (at the end of this doc).
   **Check:** `npx vitest run src/progress/findNextTopic.test.js` shows **5 passed**.
   **Commit:** `feat(progress): find the next topic`
 
-- [ ] **4.2 Mansha: `findStuckHint`, with the test first.**
+- [x] **4.2 Mansha: `findStuckHint`, with the test first.**
 
   Prompt:
   ```
@@ -242,7 +242,7 @@ one-minute answer (at the end of this doc).
   **Check:** `npx vitest run src/progress/findStuckHint.test.js` shows **4 passed**.
   **Commit:** `feat(progress): find the likely cause when stuck`
 
-- [ ] **4.3 Mansha: `buildPrompt`, with the test first.**
+- [x] **4.3 Mansha: `buildPrompt`, with the test first.**
 
   Prompt:
   ```
@@ -257,7 +257,7 @@ one-minute answer (at the end of this doc).
 
 ### Nitesh: the frontend
 
-- [ ] **N.1 Nitesh (Claude Code): the frontend skeleton.**
+- [x] **N.1 Nitesh (Claude Code): the frontend skeleton.**
   - Vite + React in `frontend/`, with the `/api` proxy, `src/api.js` and the Login and
     Sign up screens.
   - Everything follows `nitesh.md` §3.
