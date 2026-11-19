@@ -65,7 +65,7 @@ If code and docs disagree, fix one of them in the same change.
 - **No co-author lines** in commit messages (no `Co-Authored-By`).
 - Commit, push or merge only when the person you're working for asks.
 
-## Current status (18 Nov 2026)
+## Current status (19 Nov 2026)
 
 **Done:**
 
@@ -73,8 +73,12 @@ If code and docs disagree, fix one of them in the same change.
 - [x] Repo created locally and pushed to https://github.com/niteshkumar7557/trellis-map
   (`main`). It contains `docs/`, `.gitignore` and `docker-compose.yml` (Postgres 18 on
   port 5433).
+- [x] **Day 1 is complete.**
+  - Parts 1, 2 and 4 are merged into `main` (PRs #1 to #3). Gate A is open.
+  - The frontend skeleton (N.1) is in `frontend/`: Vite + React, the `/api` proxy,
+    `src/api.js`, and the Login and Sign up screens.
 
-**Not started. No code exists yet.**
+**Next: Day 2.**
 
 ## Future work, in order (details in `docs/checklist.md`)
 
@@ -84,15 +88,15 @@ If code and docs disagree, fix one of them in the same change.
 - [x] 0.2: Google OAuth credentials, with every teammate's Gmail and the demo account as
   **test users**. The redirect URI is `http://localhost:5173/api/auth/google/callback`.
 - [x] 0.3: a Groq API key and a `JWT_ACCESS_SECRET`.
-- [ ] 0.4: send each teammate the filled-in `.env` privately.
+- [x] 0.4: send each teammate the filled-in `.env` privately.
 
 **Day 1 (18 Nov):**
 
-- [ ] Everyone sets up their laptop (0.5 to 0.7).
-- [ ] Nihamika: 1.1 to 1.4. This opens **gate A**, which everyone waits on.
-- [ ] Riya: 2.1 to 2.3.
-- [ ] Mansha: 4.1 to 4.3.
-- [ ] Nitesh: N.1, the frontend skeleton.
+- [x] Everyone sets up their laptop (0.5 to 0.7).
+- [x] Nihamika: 1.1 to 1.4. This opens **gate A**, which everyone waits on.
+- [x] Riya: 2.1 to 2.3.
+- [x] Mansha: 4.1 to 4.3.
+- [x] Nitesh: N.1, the frontend skeleton.
 
 **Day 2 (19 Nov):**
 
