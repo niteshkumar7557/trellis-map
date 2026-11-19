@@ -9,7 +9,8 @@
     "start": "node src/server.js",
     "test": "vitest run",
     "db:migrate": "prisma migrate dev",
-    "db:seed": "prisma db seed"
+    "db:seed": "prisma db seed",
+    "make-admin": "node scripts/make-admin.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
