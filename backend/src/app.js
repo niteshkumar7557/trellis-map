@@ -3,6 +3,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import { topicsRouter } from "./topics/topics.routes.js";
 import { authRouter } from "./auth/auth.routes.js";
+import { progressRouter } from "./progress/progress.routes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
 export const app = express();
@@ -11,6 +12,7 @@ app.use(cookieParser());        // turns the Cookie header into req.cookies (Par
 
 app.use("/api", topicsRouter);
 app.use("/api", authRouter);
+app.use("/api", progressRouter);
 // Others add their routers here, one line each.
 
 // 404 for any /api route nobody matched, then the error handler. The error handler

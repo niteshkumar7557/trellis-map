@@ -26,6 +26,7 @@ model Topic {
   mistakes  String[]                       // common mistakes; Postgres supports arrays
   needs     TopicPrerequisite[] @relation("TopicNeeds")
   neededBy  TopicPrerequisite[] @relation("TopicNeededBy")
+  progress  Progress[]
 
   @@unique([subjectId, slug])
 }
@@ -54,4 +55,27 @@ model User {
   passwordHash String?                    // null for people who only use Google
   role         Role     @default(STUDENT)
   createdAt    DateTime @default(now())
+  progress     Progress[]
 }
+
+// ---- Part 4 (Mansha) ----
+enum Status {
+  NOT_STARTED
+  LEARNING
+  DONE
+  STUCK
+}
+
+model Progress {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  topicId   Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic     Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  status    Status   @default(NOT_STARTED)
+  note      String?
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, topicId])               // one row per student per topic
+}
+
