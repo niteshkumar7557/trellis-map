@@ -422,7 +422,7 @@ one-minute answer (at the end of this doc).
 - [x] **3.1 Nitesh: Part 3 (after gate C).** Steps 1 to 5 of `nitesh.md` §2, a commit
   each, as listed there. Swap `startSession` into Riya's signup and login. Push and open a
   PR.
-- [ ] **N.2 Nitesh: frontend screens.** The map, the topic panel and the admin screen,
+- [x] **N.2 Nitesh: frontend screens.** The map, the topic panel and the admin screen,
   wired to the real API.
 
 ---
