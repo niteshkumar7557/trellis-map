@@ -78,15 +78,20 @@ If code and docs disagree, fix one of them in the same change.
   - The frontend skeleton (N.1) is in `frontend/`: Vite + React, the `/api` proxy,
     `src/api.js`, and the Login and Sign up screens.
 
-- [x] **Day 2 is complete except N.2.**
+- [x] **Day 2 is complete.**
   - Parts 1, 2 and 4 are merged into `main` (PRs #6 to #8). Gates B and C are open.
   - Part 3 (3.1 and 3.2) is merged into `main` (PR #9): refresh with rotation, logout and
     Google sign-in, with `startSession` swapped into signup and login, and its tests. It
     also adds the missing `progress` migration.
+  - The frontend screens (N.2) are on the `frontend` branch: the map, the topic panel and
+    the admin screen, wired to the real API. The admin screen's save needs 1.8.
 
-**Next:** N.2, 1.8 and 1.9, then 5.1 to 5.4 (Day 3 is running a day late). Known issue:
-`progressRouter.use(requireAuth)` covers all of `/api`, so unknown routes give 401, not
-404. Mansha fixes it on a `fix/...` branch.
+**Next:** 1.8 and 1.9, then 5.1 to 5.4 (Day 3 is running a day late). Known issues:
+
+- `progressRouter.use(requireAuth)` covers all of `/api`, so unknown routes give 401, not
+  404. Mansha fixes it on a `fix/...` branch.
+- `GET /api/subjects/:id/next` gave 500: `getNextTopic` passed `{ subject, topics }` to
+  `findNextTopic`. Fixed on `fix/next-topic`.
 
 ## Future work, in order (details in `docs/checklist.md`)
 
@@ -112,7 +117,7 @@ If code and docs disagree, fix one of them in the same change.
 - [x] Riya: 2.4 and 2.5. This opens **gate C**.
 - [x] Mansha: 4.4 to 4.6.
 - [x] Nitesh: 3.1 (Part 3, after gate C).
-- [ ] Nitesh: N.2 (the frontend screens).
+- [x] Nitesh: N.2 (the frontend screens).
 
 **Day 3 (20 Nov):**
 

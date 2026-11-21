@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Link, Navigate, Route, Routes } from "react-router-dom";
 import { logout, restoreSession } from "./api.js";
 import AuthForm from "./AuthForm.jsx";
+import MapPage from "./MapPage.jsx";
+import AdminPage from "./AdminPage.jsx";
 
 export default function App() {
   // undefined = still asking the server, null = signed out, object = signed in.
@@ -18,6 +20,9 @@ export default function App() {
     setUser(null);
   }
 
+  const signedIn = (page) =>
+    user ? <SignedIn user={user} onLogout={handleLogout}>{page}</SignedIn> : <Navigate to="/login" />;
+
   return (
     <Routes>
       <Route
@@ -28,31 +33,33 @@ export default function App() {
         path="/signup"
         element={user ? <Navigate to="/" /> : <AuthForm mode="signup" onSignedIn={setUser} />}
       />
+      <Route path="/" element={signedIn(<MapPage />)} />
       <Route
-        path="/"
-        element={user ? <Home user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}
+        path="/admin"
+        element={signedIn(user?.role === "ADMIN" ? <AdminPage /> : <Navigate to="/" />)}
       />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 }
 
-// A placeholder until the map screen (checklist N.2).
-function Home({ user, onLogout }) {
+// The header every signed-in screen shares.
+function SignedIn({ user, onLogout, children }) {
   return (
     <>
       <header className="header">
-        <strong>Trellis</strong>
-        <span>
-          {user.name}
+        <Link to="/" className="brand">
+          Trellis
+        </Link>
+        <nav>
+          <span>{user.name}</span>
+          {user.role === "ADMIN" && <Link to="/admin">Edit topics</Link>}
           <button className="link" onClick={onLogout}>
             Log out
           </button>
-        </span>
+        </nav>
       </header>
-      <main className="center">
-        <p>Signed in as {user.email}. The map comes next.</p>
-      </main>
+      {children}
     </>
   );
 }
