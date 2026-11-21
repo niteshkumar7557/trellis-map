@@ -65,7 +65,7 @@ If code and docs disagree, fix one of them in the same change.
 - **No co-author lines** in commit messages (no `Co-Authored-By`).
 - Commit, push or merge only when the person you're working for asks.
 
-## Current status (19 Nov 2026)
+## Current status (21 Nov 2026)
 
 **Done:**
 
@@ -78,7 +78,13 @@ If code and docs disagree, fix one of them in the same change.
   - The frontend skeleton (N.1) is in `frontend/`: Vite + React, the `/api` proxy,
     `src/api.js`, and the Login and Sign up screens.
 
-**Next: Day 2.**
+- [x] **Day 2 is complete except N.2.**
+  - Parts 1, 2 and 4 are merged into `main` (PRs #6 to #8). Gates B and C are open.
+  - Part 3 (3.1) is built on the `part-3-sessions` branch: refresh with rotation, logout
+    and Google sign-in, with `startSession` swapped into signup and login. The branch also
+    adds the missing `progress` migration. No PR yet.
+
+**Next:** open the Part 3 PR, then N.2, 3.2, 1.8 and 1.9 (Day 3 is running a day late).
 
 ## Future work, in order (details in `docs/checklist.md`)
 
@@ -100,10 +106,11 @@ If code and docs disagree, fix one of them in the same change.
 
 **Day 2 (19 Nov):**
 
-- [ ] Nihamika: 1.5 to 1.7. This opens **gate B**.
-- [ ] Riya: 2.4 and 2.5. This opens **gate C**.
-- [ ] Mansha: 4.4 to 4.6.
-- [ ] Nitesh: 3.1 (Part 3, after gate C) and N.2 (the frontend screens).
+- [x] Nihamika: 1.5 to 1.7. This opens **gate B**.
+- [x] Riya: 2.4 and 2.5. This opens **gate C**.
+- [x] Mansha: 4.4 to 4.6.
+- [x] Nitesh: 3.1 (Part 3, after gate C).
+- [ ] Nitesh: N.2 (the frontend screens).
 
 **Day 3 (20 Nov):**
 

@@ -4,14 +4,19 @@ import cookieParser from "cookie-parser";
 import { topicsRouter } from "./topics/topics.routes.js";
 import { authRouter } from "./auth/auth.routes.js";
 import { progressRouter } from "./progress/progress.routes.js";
+import passport from "passport";
+import "./sessions/google.js";  // registers the Google strategy with passport
+import { sessionsRouter } from "./sessions/sessions.routes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
 export const app = express();
 app.use(express.json());        // turns a JSON body into req.body
 app.use(cookieParser());        // turns the Cookie header into req.cookies (Part 3 needs it)
+app.use(passport.initialize());
 
 app.use("/api", topicsRouter);
 app.use("/api", authRouter);
+app.use("/api/auth", sessionsRouter); // before progressRouter, whose requireAuth covers all of /api
 app.use("/api", progressRouter);
 // Others add their routers here, one line each.
 
