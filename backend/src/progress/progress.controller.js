@@ -98,7 +98,7 @@ export async function getNextTopic(req, res) {
   const subjectId = Number(req.params.id);
   const userId = req.user.id;
 
-  const sortedTopics = await getSortedTopics(prisma, subjectId);
+  const { topics: sortedTopics } = await getSortedTopics(prisma, subjectId);
 
   const rows = await prisma.progress.findMany({
     where: {
