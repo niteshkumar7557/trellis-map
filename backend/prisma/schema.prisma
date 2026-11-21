@@ -55,7 +55,20 @@ model User {
   passwordHash String?                    // null for people who only use Google
   role         Role     @default(STUDENT)
   createdAt    DateTime @default(now())
+  googleId      String?  @unique          // added by Part 3
+  refreshTokens RefreshToken[]            // added by Part 3
   progress     Progress[]
+}
+
+// ---- Part 3 (Nitesh) ----
+model RefreshToken {
+  id        Int       @id @default(autoincrement())
+  tokenHash String    @unique             // SHA-256 of the token; the token itself is never stored
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?                     // set when it is swapped for a new one
+  createdAt DateTime  @default(now())
 }
 
 // ---- Part 4 (Mansha) ----
