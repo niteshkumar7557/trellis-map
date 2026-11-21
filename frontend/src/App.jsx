@@ -3,6 +3,7 @@ import { Link, Navigate, Route, Routes } from "react-router-dom";
 import { logout, restoreSession } from "./api.js";
 import AuthForm from "./AuthForm.jsx";
 import MapPage from "./MapPage.jsx";
+import AdminPage from "./AdminPage.jsx";
 
 export default function App() {
   // undefined = still asking the server, null = signed out, object = signed in.
@@ -33,6 +34,10 @@ export default function App() {
         element={user ? <Navigate to="/" /> : <AuthForm mode="signup" onSignedIn={setUser} />}
       />
       <Route path="/" element={signedIn(<MapPage />)} />
+      <Route
+        path="/admin"
+        element={signedIn(user?.role === "ADMIN" ? <AdminPage /> : <Navigate to="/" />)}
+      />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
@@ -48,6 +53,7 @@ function SignedIn({ user, onLogout, children }) {
         </Link>
         <nav>
           <span>{user.name}</span>
+          {user.role === "ADMIN" && <Link to="/admin">Edit topics</Link>}
           <button className="link" onClick={onLogout}>
             Log out
           </button>

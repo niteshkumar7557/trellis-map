@@ -486,6 +486,59 @@ button.close {
   padding: 0.45rem 0.9rem;
 }
 
+/* ---- Admin ---- */
+
+.admin {
+  max-width: 40rem;
+  margin: 2rem auto 4rem;
+  padding: 0 1.25rem;
+}
+
+.admin > label,
+.admin form label:not(.check) {
+  display: grid;
+  gap: 0.25rem;
+  font-weight: 500;
+}
+
+.admin > label {
+  margin: 1rem 0 1.5rem;
+}
+
+.admin form {
+  display: grid;
+  gap: 1rem;
+}
+
+.admin fieldset {
+  margin: 0;
+  padding: 0.75rem 1rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.admin legend {
+  font-weight: 500;
+  padding: 0 0.25rem;
+}
+
+.needs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: 0.4rem 1rem;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.admin button[type="submit"] {
+  justify-self: start;
+  padding: 0.5rem 1.25rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
