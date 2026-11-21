@@ -269,7 +269,7 @@ one-minute answer (at the end of this doc).
 
 ### Nihamika
 
-- [ ] **1.5 Nihamika: the seed.** Run `git checkout -b part-1-topics` from the latest
+- [x] **1.5 Nihamika: the seed.** Run `git checkout -b part-1-topics` from the latest
   `main`.
 
   Prompt:
@@ -287,7 +287,7 @@ one-minute answer (at the end of this doc).
 
   **Commit:** `feat(topics): seed JavaScript fundamentals`
 
-- [ ] **1.6 Nihamika: `sortTopics`, with the test first.**
+- [x] **1.6 Nihamika: `sortTopics`, with the test first.**
 
   Prompt:
   ```
@@ -301,7 +301,7 @@ one-minute answer (at the end of this doc).
   **Check:** `npx vitest run src/topics/sortTopics.test.js` shows **4 passed**.
   **Commit:** `feat(topics): sort topics into learning order with levels`
 
-- [ ] **1.7 Nihamika: the GET routes and `getSortedTopics`.**
+- [x] **1.7 Nihamika: the GET routes and `getSortedTopics`.**
 
   Prompt:
   ```
@@ -325,7 +325,7 @@ one-minute answer (at the end of this doc).
 
 ### Riya
 
-- [ ] **2.4 Riya: `requireAuth` and `requireAdmin`, with the tests first.**
+- [x] **2.4 Riya: `requireAuth` and `requireAdmin`, with the tests first.**
 
   Prompt:
   ```
@@ -337,7 +337,7 @@ one-minute answer (at the end of this doc).
   **Check:** `npx vitest run src/auth` shows **11 passed**.
   **Commit:** `feat(auth): requireAuth and requireAdmin middlewares`
 
-- [ ] **2.5 Riya: the routes, rate limits and make-admin.**
+- [x] **2.5 Riya: the routes, rate limits and make-admin.**
 
   Prompt:
   ```
@@ -367,7 +367,7 @@ one-minute answer (at the end of this doc).
 
 ### Mansha
 
-- [ ] **4.4 Mansha: `improvePrompt`, with the test first.**
+- [x] **4.4 Mansha: `improvePrompt`, with the test first.**
 
   Prompt:
   ```
@@ -380,7 +380,7 @@ one-minute answer (at the end of this doc).
   **Check:** `npx vitest run src/progress` shows **17 passed**.
   **Commit:** `feat(progress): improve the prompt with Groq, falling back to the template`
 
-- [ ] **4.5 Mansha: the `Progress` model (after gate C).** Run `git merge main` on your
+- [x] **4.5 Mansha: the `Progress` model (after gate C).** Run `git merge main` on your
   branch.
 
   Prompt:
@@ -392,7 +392,7 @@ one-minute answer (at the end of this doc).
   **Check:** `npx prisma migrate dev --name progress` ends with "in sync".
   **Commit:** `feat(progress): add progress model`
 
-- [ ] **4.6 Mansha: the five routes (after gates B and C).**
+- [x] **4.6 Mansha: the five routes (after gates B and C).**
 
   Prompt:
   ```
@@ -419,7 +419,7 @@ one-minute answer (at the end of this doc).
 
 ### Nitesh
 
-- [ ] **3.1 Nitesh: Part 3 (after gate C).** Steps 1 to 5 of `nitesh.md` §2, a commit
+- [x] **3.1 Nitesh: Part 3 (after gate C).** Steps 1 to 5 of `nitesh.md` §2, a commit
   each, as listed there. Swap `startSession` into Riya's signup and login. Push and open a
   PR.
 - [ ] **N.2 Nitesh: frontend screens.** The map, the topic panel and the admin screen,
