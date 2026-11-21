@@ -40,3 +40,9 @@ export async function logout(req, res) {
   res.status(204).end();
 }
 
+// Passport has already put the user on req.user. The token goes in the cookie, never
+// in the URL; the frontend then calls /refresh to get its access token.
+export async function googleCallback(req, res) {
+  await startSession(res, req.user);
+  res.redirect(process.env.FRONTEND_URL);
+}
