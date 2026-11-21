@@ -374,6 +374,118 @@ button.link-inline {
   font-size: 0.875rem;
 }
 
+/* ---- The topic panel ---- */
+
+.panel {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+@media (min-width: 64rem) {
+  .panel {
+    margin-top: 0;
+    position: sticky;
+    top: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+}
+
+.panel p {
+  margin: 0.5rem 0;
+}
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+}
+
+button.close {
+  background: none;
+  color: var(--muted);
+  font-size: 1.5rem;
+  line-height: 1;
+  padding: 0 0.25rem;
+}
+
+.mistakes {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.status-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.status-button {
+  padding: 0.4rem 0.75rem;
+  border: 2px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+}
+
+/* The pressed button takes its status colour, like the topic on the map. */
+.status-button[aria-pressed="true"] {
+  font-weight: 700;
+  border-color: var(--text);
+}
+
+.status-button.status-LEARNING[aria-pressed="true"] {
+  border-color: var(--learning);
+  background: var(--learning-bg);
+}
+
+.status-button.status-DONE[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--done-bg);
+}
+
+.status-button.status-STUCK[aria-pressed="true"] {
+  border-color: var(--stuck);
+  background: var(--stuck-bg);
+}
+
+.note {
+  display: grid;
+  gap: 0.25rem;
+  margin: 1rem 0 0.5rem;
+  font-weight: 500;
+}
+
+.hint {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--stuck);
+  background: var(--stuck-bg);
+}
+
+.prompt {
+  margin: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  white-space: pre-wrap;
+  font: 0.875rem/1.5 ui-monospace, Menlo, Consolas, monospace;
+}
+
+.prompt-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.prompt-actions button {
+  padding: 0.45rem 0.9rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;

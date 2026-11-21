@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { apiFetch } from "./api.js";
+import TopicPanel from "./TopicPanel.jsx";
 import { STATUS_LABELS } from "./statuses.js";
 
 // The map: the subject's topics in learning order, one row per level.
@@ -106,6 +107,18 @@ export default function MapPage() {
         )}
       </section>
 
+      {selected && (
+        <TopicPanel
+          // A new key per topic, so the note box and prompt start fresh.
+          key={selected.id}
+          topic={selected}
+          topicsById={topicsById}
+          status={statusById[selected.id] ?? "NOT_STARTED"}
+          note={noteById[selected.id] ?? ""}
+          onSaved={() => loadProgress(subject.id)}
+          onClose={() => setSelectedId(null)}
+        />
+      )}
     </div>
   );
 }
