@@ -459,7 +459,7 @@ one-minute answer (at the end of this doc).
   **Commit:** `test(topics): error handler`
 
   Push and open a PR.
-- [ ] **3.2 Nitesh: Part 3 tests**, `nitesh.md` §2 step 6. Push and merge every open PR.
+- [x] **3.2 Nitesh: Part 3 tests**, `nitesh.md` §2 step 6. Push and merge every open PR.
 
 ### Everyone together (second hour)
 

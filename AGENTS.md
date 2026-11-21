@@ -80,11 +80,13 @@ If code and docs disagree, fix one of them in the same change.
 
 - [x] **Day 2 is complete except N.2.**
   - Parts 1, 2 and 4 are merged into `main` (PRs #6 to #8). Gates B and C are open.
-  - Part 3 (3.1) is built on the `part-3-sessions` branch: refresh with rotation, logout
-    and Google sign-in, with `startSession` swapped into signup and login. The branch also
-    adds the missing `progress` migration. No PR yet.
+  - Part 3 (3.1 and 3.2) is merged into `main` (PR #9): refresh with rotation, logout and
+    Google sign-in, with `startSession` swapped into signup and login, and its tests. It
+    also adds the missing `progress` migration.
 
-**Next:** open the Part 3 PR, then N.2, 3.2, 1.8 and 1.9 (Day 3 is running a day late).
+**Next:** N.2, 1.8 and 1.9, then 5.1 to 5.4 (Day 3 is running a day late). Known issue:
+`progressRouter.use(requireAuth)` covers all of `/api`, so unknown routes give 401, not
+404. Mansha fixes it on a `fix/...` branch.
 
 ## Future work, in order (details in `docs/checklist.md`)
 
@@ -115,7 +117,7 @@ If code and docs disagree, fix one of them in the same change.
 **Day 3 (20 Nov):**
 
 - [ ] Nihamika: 1.8 and 1.9.
-- [ ] Nitesh: 3.2 (Part 3 tests) and merge every open PR.
+- [x] Nitesh: 3.2 (Part 3 tests) and merge every open PR.
 - [ ] Everyone: 5.1 to 5.4 (run everything, rehearse the demo, practise the one-minute
   answers).
 
