@@ -2,7 +2,7 @@ import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { HttpError } from "../lib/httpError.js";
 import { hashPassword, checkPassword } from "./password.js";
-import { signAccessToken } from "./tokens.js";
+import { startSession } from "../sessions/startSession.js";
 
 export const signupSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(80, "Name must be at most 80 characters"),
@@ -39,11 +39,7 @@ export async function signup(req, res) {
     data: { name, email, passwordHash },
   });
 
-  // Part 3 (Nitesh) replaces this with startSession(res, user)
-  res.status(201).json({
-    accessToken: signAccessToken(user),
-    user: publicUser(user),
-  });
+  res.status(201).json(await startSession(res, user));
 }
 
 export async function login(req, res) {
@@ -57,11 +53,7 @@ export async function login(req, res) {
     throw new HttpError(401, "Wrong email or password");
   }
 
-  // Part 3 (Nitesh) replaces this with startSession(res, user)
-  res.json({
-    accessToken: signAccessToken(user),
-    user: publicUser(user),
-  });
+  res.json(await startSession(res, user));
 }
 
 export async function me(req, res) {
