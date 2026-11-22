@@ -6,6 +6,7 @@ const EMPTY = { name: "", summary: "", mistakes: "", needs: [] };
 // Admins add and edit topics. The server checks the role too (403 for a student);
 // hiding the link is only so students don't see a screen they can't use.
 export default function AdminPage() {
+  const [subjects, setSubjects] = useState([]);
   const [subject, setSubject] = useState(null);
   const [topics, setTopics] = useState([]);
   const [editingId, setEditingId] = useState(""); // "" = a new topic
@@ -14,9 +15,12 @@ export default function AdminPage() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  async function loadTopics() {
-    const { subjects } = await apiFetch("/api/subjects");
-    const data = await apiFetch(`/api/subjects/${subjects[0].id}/topics`);
+  async function loadTopics(subjectIdToLoad) {
+    const { subjects: list } = await apiFetch("/api/subjects");
+    setSubjects(list);
+    const targetId = subjectIdToLoad ?? subject?.id ?? list[0]?.id;
+    if (!targetId) return;
+    const data = await apiFetch(`/api/subjects/${targetId}/topics`);
     setSubject(data.subject);
     setTopics(data.topics);
   }
@@ -24,6 +28,14 @@ export default function AdminPage() {
   useEffect(() => {
     loadTopics().catch((err) => setError(err.message));
   }, []);
+
+  function handleSubjectChange(newSubjectId) {
+    setEditingId("");
+    setForm(EMPTY);
+    setMessage("");
+    setError("");
+    loadTopics(newSubjectId).catch((err) => setError(err.message));
+  }
 
   function pickTopic(id) {
     setEditingId(id);
@@ -58,7 +70,10 @@ export default function AdminPage() {
       name: form.name.trim(),
       summary: form.summary.trim(),
       // One mistake per line in the box; the API wants a list.
-      mistakes: form.mistakes.split("\n").map((m) => m.trim()).filter(Boolean),
+      mistakes: form.mistakes
+        .split("\n")
+        .map((m) => m.trim())
+        .filter(Boolean),
       needs: form.needs,
     };
     try {
@@ -66,11 +81,14 @@ export default function AdminPage() {
         await apiFetch(`/api/topics/${editingId}`, { method: "PUT", body });
         setMessage(`Saved ${body.name}.`);
       } else {
-        await apiFetch("/api/topics", { method: "POST", body: { ...body, subjectId: subject.id } });
+        await apiFetch("/api/topics", {
+          method: "POST",
+          body: { ...body, subjectId: subject.id },
+        });
         setMessage(`Added ${body.name}.`);
         setForm(EMPTY);
       }
-      await loadTopics();
+      await loadTopics(subject.id);
     } catch (err) {
       setError(err.message); // for example a loop in the links gives 400
     } finally {
@@ -108,6 +126,21 @@ export default function AdminPage() {
             <p className="muted">Pick one to change it, or start a new one.</p>
           </div>
           <div className="settings-panel">
+            {subjects.length > 1 && (
+              <label className="field">
+                Subject
+                <select
+                  value={subject.id}
+                  onChange={(e) => handleSubjectChange(Number(e.target.value))}
+                >
+                  {subjects.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
             <label className="field">
               Topic
               <select value={editingId} onChange={(e) => pickTopic(e.target.value)}>
@@ -122,12 +155,12 @@ export default function AdminPage() {
           </div>
         </section>
 
-        <section className="settings-row" aria-labelledby="details-title">
+        <section className="settings-row" aria-labelledby="fields-title">
           <div className="settings-label">
-            <h2 id="details-title">Details</h2>
+            <h2 id="fields-title">{editingId ? "Topic details" : "New topic"}</h2>
             <p className="muted">
-              Students see the name and summary on the map, and the mistakes in the topic
-              panel and the prompt.
+              Keep the summary short. Common mistakes are shown in the panel when the topic is
+              clicked.
             </p>
           </div>
           <div className="settings-panel">
@@ -149,61 +182,59 @@ export default function AdminPage() {
               />
             </label>
             <label className="field">
-              Common mistakes
+              Common mistakes (one per line)
               <textarea
                 rows={4}
                 value={form.mistakes}
                 onChange={(e) => setForm({ ...form, mistakes: e.target.value })}
-                aria-describedby="mistakes-hint"
               />
-              <span className="field-hint" id="mistakes-hint">
-                One mistake per line.
-              </span>
             </label>
           </div>
         </section>
 
         <section className="settings-row" aria-labelledby="needs-title">
           <div className="settings-label">
-            <h2 id="needs-title">Needs these topics first</h2>
+            <h2 id="needs-title">Needs first</h2>
             <p className="muted">
-              They decide the topic's step on the map. A loop, where two topics need each
-              other, is refused.
+              Check every earlier topic a student should finish before this one. Loops (A needs B
+              and B needs A) are refused.
             </p>
-            <p className="muted num">{form.needs.length} chosen</p>
           </div>
-          <fieldset className="settings-panel">
-            <legend className="visually-hidden">Needs these topics first</legend>
-            <div className="needs-grid">
-              {topics
-                .filter((t) => t.id !== Number(editingId))
-                .map((t) => (
-                  <label key={t.id} className="check">
-                    <input
-                      type="checkbox"
-                      checked={form.needs.includes(t.id)}
-                      onChange={() => toggleNeed(t.id)}
-                    />
-                    {t.name}
-                  </label>
-                ))}
-            </div>
-          </fieldset>
+          <div className="settings-panel">
+            <fieldset className="field">
+              <legend className="visually-hidden">Prerequisites</legend>
+              <div className="needs-grid">
+                {topics
+                  .filter((t) => t.id !== Number(editingId))
+                  .map((t) => (
+                    <label key={t.id} className="check">
+                      <input
+                        type="checkbox"
+                        checked={form.needs.includes(t.id)}
+                        onChange={() => toggleNeed(t.id)}
+                      />
+                      {t.name}
+                    </label>
+                  ))}
+              </div>
+            </fieldset>
+          </div>
         </section>
 
-        <div className="save-row">
-          {message && (
-            <p className="success" role="status">
-              {message}
-            </p>
-          )}
-          {error && (
-            <p className="error" role="alert">
-              {error}
-            </p>
-          )}
+        {message && (
+          <p className="notice notice-success" role="status">
+            {message}
+          </p>
+        )}
+        {error && (
+          <p className="notice" role="alert">
+            {error}
+          </p>
+        )}
+
+        <div className="form-actions">
           <button type="submit" className="btn" disabled={busy}>
-            {busy ? "Saving…" : editingId ? "Save changes" : "Add topic"}
+            {editingId ? "Save changes" : "Add topic"}
           </button>
         </div>
       </form>

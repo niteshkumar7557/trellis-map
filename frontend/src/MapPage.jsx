@@ -15,6 +15,11 @@ function nameList(list) {
 
 // The map: the subject's topics in learning order, one row per level.
 export default function MapPage({ user }) {
+  const [subjects, setSubjects] = useState([]);
+  const [selectedSubjectId, setSelectedSubjectId] = useState(() => {
+    const saved = localStorage.getItem("trellis-subject-id");
+    return saved ? Number(saved) : null;
+  });
   const [subject, setSubject] = useState(null);
   const [topics, setTopics] = useState([]);
   const [statusById, setStatusById] = useState({});
@@ -38,19 +43,30 @@ export default function MapPage({ user }) {
   useEffect(() => {
     async function load() {
       try {
-        // There is one subject for now: JavaScript fundamentals.
-        const { subjects } = await apiFetch("/api/subjects");
-        if (subjects.length === 0) throw new Error("No subjects yet. Run the seed.");
-        const data = await apiFetch(`/api/subjects/${subjects[0].id}/topics`);
+        const { subjects: list } = await apiFetch("/api/subjects");
+        if (list.length === 0) throw new Error("No subjects yet. Run the seed.");
+        setSubjects(list);
+
+        const targetId = list.some((s) => s.id === selectedSubjectId)
+          ? selectedSubjectId
+          : list[0].id;
+
+        setSelectedSubjectId(targetId);
+        const data = await apiFetch(`/api/subjects/${targetId}/topics`);
         setSubject(data.subject);
         setTopics(data.topics);
-        await loadProgress(data.subject.id);
+        await loadProgress(targetId);
       } catch (err) {
         setError(err.message);
       }
     }
     load();
   }, [loadProgress]);
+
+  function handleSelectSubject(id) {
+    setSelectedSubjectId(id);
+    localStorage.setItem("trellis-subject-id", String(id));
+  }
 
   if (error) {
     return (
@@ -78,6 +94,27 @@ export default function MapPage({ user }) {
 
   return (
     <main className={selected ? "page map-layout has-panel" : "page map-layout"}>
+      {subjects.length > 1 && (
+        <div className="subject-bar" role="tablist" aria-label="Select subject">
+          {subjects.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              role="tab"
+              aria-selected={s.id === (subject?.id ?? selectedSubjectId)}
+              className={
+                s.id === (subject?.id ?? selectedSubjectId)
+                  ? "subject-tab is-active"
+                  : "subject-tab"
+              }
+              onClick={() => handleSelectSubject(s.id)}
+            >
+              {s.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="title-row">
         <div>
           <h1 className="greeting">
