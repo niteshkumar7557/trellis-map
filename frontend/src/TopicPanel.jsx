@@ -5,7 +5,7 @@ import { CloseIcon } from "./ui.jsx";
 
 // Opens beside the map when a topic is clicked. It never explains the topic itself:
 // it builds a prompt for the student's own AI.
-export default function TopicPanel({ topic, topicsById, status, note, onSaved, onClose }) {
+export default function TopicPanel({ topic, subject, topicsById, status, note, onSaved, onClose }) {
   const [noteDraft, setNoteDraft] = useState(note ?? "");
   const [prompt, setPrompt] = useState("");
   const [hint, setHint] = useState(null);
@@ -77,7 +77,12 @@ export default function TopicPanel({ topic, topicsById, status, note, onSaved, o
   const needs = topic.needs.map((id) => topicsById[id]?.name).filter(Boolean);
 
   return (
-    <aside className="panel topic-panel" aria-labelledby="panel-title" ref={panelRef}>
+    <aside
+      className="panel topic-panel"
+      aria-labelledby="panel-title"
+      ref={panelRef}
+      data-subject={subject?.slug}
+    >
       <div className="topic-panel-head">
         <h2 id="panel-title">{topic.name}</h2>
         <button className="icon-btn" onClick={onClose} aria-label="Close the topic">

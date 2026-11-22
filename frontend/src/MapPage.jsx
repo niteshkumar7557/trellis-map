@@ -183,6 +183,7 @@ export default function MapPage({ user, selectedSubjectId }) {
         <TopicPanel
           key={selected.id}
           topic={selected}
+          subject={subject}
           topicsById={topicsById}
           status={statusOf(selected)}
           note={noteById[selected.id] ?? ""}
