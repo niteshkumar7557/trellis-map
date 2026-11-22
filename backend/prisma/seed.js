@@ -288,6 +288,14 @@ export const MONGODB_TOPICS = [
   },
 ];
 
+export const REACT_SUBJECT = {
+  slug: "react",
+  name: "React fundamentals",
+  description: "Learn React fundamentals, component architecture, hooks, and state in topic order.",
+};
+
+export const REACT_TOPICS = [];
+
 /**
  * Upserts a subject, its topics, and prerequisite links.
  * Preserves existing topic IDs and user progress records.
@@ -361,9 +369,25 @@ export async function seedSubject(db, subjectData, topics) {
   return { subject, topicCount: topics.length, prereqCount: prereqRows.length };
 }
 
+export const DEFAULT_SUBJECTS = [
+  { subject: JAVASCRIPT_SUBJECT, topics: JAVASCRIPT_TOPICS },
+  { subject: MONGODB_SUBJECT, topics: MONGODB_TOPICS },
+  { subject: REACT_SUBJECT, topics: REACT_TOPICS },
+];
+
+export async function seedAll(db, subjects = DEFAULT_SUBJECTS) {
+  const results = [];
+  for (const entry of subjects) {
+    if (entry.topics && entry.topics.length > 0) {
+      const res = await seedSubject(db, entry.subject, entry.topics);
+      results.push(res);
+    }
+  }
+  return results;
+}
+
 async function main() {
-  await seedSubject(prisma, JAVASCRIPT_SUBJECT, JAVASCRIPT_TOPICS);
-  await seedSubject(prisma, MONGODB_SUBJECT, MONGODB_TOPICS);
+  await seedAll(prisma);
 }
 
 // Run when called directly by "node prisma/seed.js"
