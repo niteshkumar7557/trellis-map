@@ -4,15 +4,8 @@ A study planner built around a map of topics. It never explains a topic itself. 
 what to study next, points to the earlier topic that is probably why you're stuck, and
 writes a prompt you paste into your own AI.
 
-Team: Nitesh, Riya, Nihamika, Mansha. Each person's part, step by step, is in their own doc:
-
-| Doc | Who | Part |
-|---|---|---|
-| `docs/nihamika.md` | Nihamika | Part 1: foundation and topics |
-| `docs/riya.md` | Riya | Part 2: login and access control |
-| `docs/nitesh.md` | Nitesh | Part 3: sessions and Google sign-in, plus the frontend and repo setup |
-| `docs/mansha.md` | Mansha | Part 4: progress and AI |
-| `docs/checklist.md` | Everyone | The three days, step by step: who, what to paste into the AI, how to check, what to commit |
+Team: Nihamika, Riya, Nitesh and Mansha. Each person owns one backend part; §13 says who
+built what.
 
 ---
 
@@ -86,7 +79,7 @@ own folder, so their commits are easy to show and merge conflicts are rare.
 
 ```
 trellis-map/
-├── docs/                     # these five docs
+├── docs/design.md            # this doc
 ├── docker-compose.yml        # Postgres for development (Nitesh)
 ├── backend/
 │   ├── package.json
@@ -407,8 +400,8 @@ all up.
 
 ## 9. The subject: JavaScript fundamentals
 
-Seeded by `prisma/seed.js` (Part 1). The full content (summaries and mistakes) is in
-`docs/nihamika.md`.
+Seeded by `prisma/seed.js` (Part 1), which also holds each topic's summary and common
+mistakes.
 
 | # | slug | Topic | Needs |
 |---|---|---|---|
@@ -485,25 +478,62 @@ How code is written so it can be tested:
   - `app.js`: one line to mount your router;
   - `package.json`: add your dependencies.
 
-## 13. The order of work (about 6 hours)
+## 13. Who built what
 
-This is the overview. The day-by-day steps, with the prompts to paste, are in
-`docs/checklist.md`; follow that one.
+Every part has its own branch and pull requests, merged with a merge commit, so each
+person's commits show on GitHub under their name.
 
-| When | Nihamika (1) | Riya (2) | Mansha (4) | Nitesh (3 + frontend) |
-|---|---|---|---|---|
-| Before the session | | | Groq API key | Repo, docs, `docker-compose.yml`, Google credentials, Groq key shared privately |
-| Hour 0–1 | App skeleton, error handler, Prisma, topic models, **push** | Read `riya.md`, install, wait for the skeleton | Write `findNextTopic`, `findStuckHint`, `buildPrompt` + tests (no database needed) | Frontend screens against the API in §7 |
-| Hour 1–2 | Seed, `sortTopics` + tests, GET routes | User model, signup, login, `requireAuth` | `improvePrompt` + tests | Frontend |
-| Hour 2–3 | Wait for `requireAdmin`, then admin POST/PUT routes | `requireAdmin`, rate limiters, `make-admin`, tests | Progress model and routes (after Riya's `User` and `requireAuth` merge) | Refresh tokens, `startSession`, logout |
-| Hour 3–4 | Tests, help others | Help Nitesh plug `startSession` into signup/login | Prompt routes, AI route + rate limit | Google sign-in, tests |
-| Hour 4–6 | **Everyone:** run the whole thing, fix, practise the demo and the viva questions in your doc | | | |
+### Part 1, foundation and topics: Nihamika
 
-**If time runs out, cut in this order:**
+- **The base of the backend:** the package, the Express app (`app.js`, `server.js`), the
+  shared Prisma client and `HttpError` (`lib/`), the error handler and `validateBody`
+  (`middleware/`).
+- **The topic models:** `Subject`, `Topic` and `TopicPrerequisite` in `schema.prisma`.
+- **The seed:** `prisma/seed.js` loads JavaScript fundamentals: 15 topics and their
+  "needs" links.
+- **`sortTopics`:** puts topics in learning order with a level each, and refuses a loop
+  with 400.
+- **The topic routes:** `GET /api/subjects`, `GET /api/subjects/:id/topics`, and the admin
+  `POST /api/topics` and `PUT /api/topics/:id` (topic and links saved in one transaction).
+- **Tests:** `sortTopics.test.js`. `errorHandler.test.js` was added by Nitesh.
 
-1. Admin `PUT` (keep `POST`).
-2. Google sign-in (email login still works).
-3. The AI route (the template prompt still works).
+### Part 2, login and access control: Riya
+
+- **The `User` model** with a `Role` (`STUDENT` or `ADMIN`).
+- **Passwords:** hashed and checked with bcrypt (`password.js`).
+- **Access tokens:** 15-minute JWTs signed and checked (`tokens.js`).
+- **`requireAuth`** (401 without a valid token) and **`requireAdmin`** (403 for students).
+- **The routes:** `POST /api/auth/signup`, `POST /api/auth/login`, `GET /api/me`.
+- **Rate limits** on login and on the AI route (`rateLimits.js`), and
+  **`npm run make-admin`** (`scripts/make-admin.js`).
+- **Tests:** passwords, tokens, `requireAuth`, `requireAdmin`.
+
+### Part 3, sessions and Google: Nitesh
+
+- **The `RefreshToken` model:** only the SHA-256 hash of the token is stored.
+- **Refresh tokens:** created, hashed and checked (`refreshTokens.js`), and
+  `startSession`, which sets the httpOnly cookie and returns an access token. Riya's signup
+  and login call it.
+- **The routes:** `POST /api/auth/refresh` (with rotation: each token works once) and
+  `POST /api/auth/logout`.
+- **Google sign-in** through Passport: `GET /api/auth/google` and its callback, with
+  `findOrCreateGoogleUser`.
+- **Tests:** `checkRefreshToken` and `findOrCreateGoogleUser` with a fake database.
+- **Also:** the repo, `docker-compose.yml`, the Google and Groq setup, and the whole
+  frontend (React + Vite, built with Claude Code): login and sign up, the map, the topic
+  panel and the admin screen.
+
+### Part 4, progress and AI: Mansha
+
+- **The `Progress` model:** one row per student per topic, with a status and a note.
+- **`findNextTopic`:** the first unfinished topic whose prerequisites are all done.
+- **`findStuckHint`:** the earlier topic that "may be" why the student is stuck.
+- **`buildPrompt`:** the study prompt from the template in §8.
+- **`improvePrompt`:** one Groq call through `fetch`, falling back to the template if it
+  fails or takes over 8 seconds.
+- **The routes:** progress, next topic, prompt and "Improve with AI" (behind Riya's
+  per-user AI rate limit), each behind `requireAuth`.
+- **Tests:** all four functions; `improvePrompt` with a faked `fetch`.
 
 ## 14. Where this falls short of production
 
