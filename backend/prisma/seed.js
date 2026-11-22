@@ -1,6 +1,12 @@
 import { prisma } from "../src/lib/prisma.js";
 
-const TOPICS = [
+export const JAVASCRIPT_SUBJECT = {
+  slug: "javascript",
+  name: "JavaScript fundamentals",
+  description: "Learn JavaScript fundamentals in topic order.",
+};
+
+export const JAVASCRIPT_TOPICS = [
   {
     slug: "variables",
     name: "Variables and types",
@@ -153,25 +159,27 @@ const TOPICS = [
   },
 ];
 
-async function main() {
-  // 1. Upsert the subject "javascript"
-  const subject = await prisma.subject.upsert({
-    where: { slug: "javascript" },
+/**
+ * Upserts a subject, its topics, and prerequisite links.
+ * Preserves existing topic IDs and user progress records.
+ */
+export async function seedSubject(db, subjectData, topics) {
+  const subject = await db.subject.upsert({
+    where: { slug: subjectData.slug },
     update: {
-      name: "JavaScript fundamentals",
-      description: "Learn JavaScript fundamentals in topic order.",
+      name: subjectData.name,
+      description: subjectData.description,
     },
     create: {
-      slug: "javascript",
-      name: "JavaScript fundamentals",
-      description: "Learn JavaScript fundamentals in topic order.",
+      slug: subjectData.slug,
+      name: subjectData.name,
+      description: subjectData.description,
     },
   });
 
-  // 2. Upsert every topic for this subject
   const topicMap = new Map();
-  for (const t of TOPICS) {
-    const topic = await prisma.topic.upsert({
+  for (const t of topics) {
+    const topic = await db.topic.upsert({
       where: {
         subjectId_slug: {
           subjectId: subject.id,
@@ -194,8 +202,8 @@ async function main() {
     topicMap.set(t.slug, topic);
   }
 
-  // 3. Delete this subject's TopicPrerequisite rows and recreate them from "needs"
-  await prisma.topicPrerequisite.deleteMany({
+  // Delete only this subject's TopicPrerequisite links so progress and other subjects remain intact
+  await db.topicPrerequisite.deleteMany({
     where: {
       topic: {
         subjectId: subject.id,
@@ -204,26 +212,38 @@ async function main() {
   });
 
   const prereqRows = [];
-  for (const t of TOPICS) {
+  for (const t of topics) {
     const topicId = topicMap.get(t.slug).id;
     for (const needSlug of t.needs) {
-      const prerequisiteId = topicMap.get(needSlug).id;
-      prereqRows.push({ topicId, prerequisiteId });
+      const prerequisite = topicMap.get(needSlug);
+      if (prerequisite) {
+        prereqRows.push({ topicId, prerequisiteId: prerequisite.id });
+      }
     }
   }
 
-  await prisma.topicPrerequisite.createMany({
-    data: prereqRows,
-  });
+  if (prereqRows.length > 0) {
+    await db.topicPrerequisite.createMany({
+      data: prereqRows,
+    });
+  }
 
-  console.log(`Seeded ${TOPICS.length} topics and ${prereqRows.length} prerequisite links for ${subject.slug}.`);
+  console.log(`Seeded ${topics.length} topics and ${prereqRows.length} prerequisite links for ${subject.slug}.`);
+  return { subject, topicCount: topics.length, prereqCount: prereqRows.length };
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+async function main() {
+  await seedSubject(prisma, JAVASCRIPT_SUBJECT, JAVASCRIPT_TOPICS);
+}
+
+// Run when called directly by "node prisma/seed.js"
+if (process.argv[1]?.endsWith("seed.js")) {
+  main()
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}
