@@ -13,14 +13,14 @@ import {
 
 export const progressRouter = Router();
 
-progressRouter.use(requireAuth);
-
-progressRouter.get("/subjects/:id/progress", getProgress);
+// A router mounted at /api with router.use() would run requireAuth on every /api request.
+progressRouter.get("/subjects/:id/progress", requireAuth, getProgress);
 progressRouter.put(
   "/progress/:topicId",
+  requireAuth,
   validateBody(updateProgressSchema),
   updateProgress
 );
-progressRouter.get("/subjects/:id/next", getNextTopic);
-progressRouter.get("/topics/:id/prompt", getPrompt);
-progressRouter.post("/topics/:id/prompt/improve", aiLimiter, improveTopicPrompt);
+progressRouter.get("/subjects/:id/next", requireAuth, getNextTopic);
+progressRouter.get("/topics/:id/prompt", requireAuth, getPrompt);
+progressRouter.post("/topics/:id/prompt/improve", requireAuth, aiLimiter, improveTopicPrompt);
