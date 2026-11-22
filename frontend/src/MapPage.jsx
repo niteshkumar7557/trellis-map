@@ -13,13 +13,9 @@ function nameList(list) {
   return list.length > 2 ? `${names} and ${list.length - 2} more` : names;
 }
 
-// The map: the selected subject's topics in learning order, one row per level.
-export default function MapPage({ user }) {
-  const [subjects, setSubjects] = useState([]);
-  const [selectedSubjectId, setSelectedSubjectId] = useState(() => {
-    const saved = localStorage.getItem("trellis-subject-id");
-    return saved ? Number(saved) : null;
-  });
+// The map: the subject's topics in learning order, one row per level.
+// selectedSubjectId is controlled by App.jsx (via the header tabs).
+export default function MapPage({ user, selectedSubjectId }) {
   const [subject, setSubject] = useState(null);
   const [topics, setTopics] = useState([]);
   const [statusById, setStatusById] = useState({});
@@ -28,8 +24,7 @@ export default function MapPage({ user }) {
   const [selectedId, setSelectedId] = useState(null);
   const [error, setError] = useState("");
 
-  // Progress and the next topic change whenever a status is saved, so they reload
-  // together. The topics themselves don't change while the page is open.
+  // Progress and next-topic reload together whenever a status is saved.
   const loadProgress = useCallback(async (subjectId) => {
     const [{ progress }, { next }] = await Promise.all([
       apiFetch(`/api/subjects/${subjectId}/progress`),
@@ -40,42 +35,23 @@ export default function MapPage({ user }) {
     setNext(next);
   }, []);
 
-  // Fetch subject list once on mount and establish initial subject
-  useEffect(() => {
-    async function initSubjects() {
-      try {
-        const { subjects: list } = await apiFetch("/api/subjects");
-        if (list.length === 0) throw new Error("No subjects yet. Run the seed.");
-        setSubjects(list);
-
-        const targetId = list.some((s) => s.id === selectedSubjectId)
-          ? selectedSubjectId
-          : list[0].id;
-
-        setSelectedSubjectId(targetId);
-      } catch (err) {
-        setError(err.message);
-      }
-    }
-    initSubjects();
-  }, []);
-
-  // Whenever selectedSubjectId changes, drive the topic map and load its topics & progress
+  // Reload topics and progress whenever the selected subject changes.
   useEffect(() => {
     if (!selectedSubjectId) return;
 
     let cancelled = false;
-    async function loadSubjectData() {
+    async function load() {
       try {
         setError("");
-        setSelectedId(null); // Close any topic panel from a previous subject
-        setStatusById({});   // Reset progress statuses so previous subject data is not shown
+        setSelectedId(null);
+        setSubject(null);
+        setTopics([]);
+        setStatusById({});
         setNoteById({});
-        setNext(undefined);  // Reset next topic while loading
+        setNext(undefined);
 
         const data = await apiFetch(`/api/subjects/${selectedSubjectId}/topics`);
         if (cancelled) return;
-
         setSubject(data.subject);
         setTopics(data.topics);
         await loadProgress(selectedSubjectId);
@@ -84,17 +60,9 @@ export default function MapPage({ user }) {
       }
     }
 
-    loadSubjectData();
-    return () => {
-      cancelled = true;
-    };
+    load();
+    return () => { cancelled = true; };
   }, [selectedSubjectId, loadProgress]);
-
-  function handleSelectSubject(id) {
-    if (id === selectedSubjectId) return;
-    setSelectedSubjectId(id);
-    localStorage.setItem("trellis-subject-id", String(id));
-  }
 
   if (error) {
     return (
@@ -114,7 +82,7 @@ export default function MapPage({ user }) {
   const doneCount = topicsWith("DONE").length;
   const firstName = user.name.split(" ")[0];
 
-  // Group the topics into rows by level. They arrive in learning order already.
+  // Group topics into rows by level. They arrive in learning order already.
   const levels = [];
   for (const topic of topics) {
     (levels[topic.level] ??= []).push(topic);
@@ -122,26 +90,6 @@ export default function MapPage({ user }) {
 
   return (
     <main className={selected ? "page map-layout has-panel" : "page map-layout"}>
-      {subjects.length > 1 && (
-        <div className="subject-bar" role="tablist" aria-label="Select subject">
-          {subjects.map((s) => {
-            const isActive = s.id === selectedSubjectId;
-            return (
-              <button
-                key={s.id}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                className={isActive ? "subject-tab is-active" : "subject-tab"}
-                onClick={() => handleSelectSubject(s.id)}
-              >
-                {s.name}
-              </button>
-            );
-          })}
-        </div>
-      )}
-
       <div className="title-row">
         <div>
           <h1 className="greeting">
@@ -227,7 +175,6 @@ export default function MapPage({ user }) {
 
       {selected && (
         <TopicPanel
-          // A new key per topic, so the note box and prompt start fresh.
           key={selected.id}
           topic={selected}
           topicsById={topicsById}

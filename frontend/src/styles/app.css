@@ -140,6 +140,42 @@
   outline-offset: 2px;
 }
 
+/* ---- Subject tabs in the header nav ---- */
+
+.header-subject-tabs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 0 4px;
+  border-left: 1px solid var(--border);
+  margin-left: 4px;
+}
+
+/* Subject tab buttons reuse the same nav-link look */
+.header-subject-tabs button {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-chip);
+  color: var(--muted);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+
+.header-subject-tabs button:hover {
+  color: var(--text);
+}
+
+.header-subject-tabs button.active {
+  background: var(--active);
+  color: var(--text);
+}
+
 /* ---- The title row every screen opens with ---- */
 
 .title-row {
@@ -192,15 +228,19 @@
     grid-template-columns: minmax(0, 1fr) 400px;
   }
 
-  .map-layout > .title-row,
-  .map-layout > .progress-strip,
-  .map-layout > .counts {
-    grid-column: 1 / -1;
-  }
+  /* Every full-width element spans both columns and is pinned to its row */
+  .map-layout > .subject-switch { grid-column: 1 / -1; grid-row: 1; }
+  .map-layout > .title-row      { grid-column: 1 / -1; grid-row: 2; }
+  .map-layout > .progress-strip { grid-column: 1 / -1; grid-row: 3; }
+  .map-layout > .counts         { grid-column: 1 / -1; grid-row: 4; }
 
+  /* Map section: column 1, row 5 — never moves */
+  .map-layout > .map { grid-column: 1; grid-row: 5; }
+
+  /* Topic panel: column 2, same row 5 — sticky beside the map */
   .map-layout.has-panel > .topic-panel {
     grid-column: 2;
-    grid-row: 4;
+    grid-row: 5;
     position: sticky;
     top: 16px;
     max-height: calc(100vh - 32px);
