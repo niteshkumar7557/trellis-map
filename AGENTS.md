@@ -25,15 +25,13 @@ backend. The viva is short: about one minute of questions each. **Keep everythin
 | 4: progress and AI | Mansha | `backend/src/progress/` |
 | Frontend (React + Vite) | Nitesh, built with Claude Code | `frontend/` |
 
-## The docs (the source of truth)
+## The doc (the source of truth)
 
-| Doc | What's in it |
-|---|---|
-| `docs/design.md` | What the app does, stack, folders, full Prisma schema, how sign-in works, every API route, the exact rules (next topic, stuck hint, prompt, AI), the 15 topics, `.env`, tests, git workflow |
-| `docs/checklist.md` | **The three days, step by step.** Who does each step, the prompt to paste, the check, the commit. **Follow this.** |
-| `docs/nihamika.md`, `docs/riya.md`, `docs/nitesh.md`, `docs/mansha.md` | Each part in detail, with its tests and likely viva questions |
+`docs/design.md` is the only doc. It has what the app does, the stack, the folders, the full
+Prisma schema, how sign-in works, every API route, the exact rules (next topic, stuck hint,
+prompt, AI), the 15 topics, `.env`, tests, the git workflow and who built what.
 
-If code and docs disagree, fix one of them in the same change.
+If code and the doc disagree, fix one of them in the same change.
 
 ## Rules for every agent
 
@@ -43,12 +41,12 @@ If code and docs disagree, fix one of them in the same change.
     cookie-parser, passport + passport-google-oauth20, express-rate-limit, Vitest;
   - AI: Groq through plain `fetch`;
   - frontend: React + Vite.
-- **Only touch the files the step names.** Each person's commits must stay in their own
+- **Only touch the files the feature needs.** Each person's commits must stay in their own
   part. The shared files take one small addition each:
   - `schema.prisma`: add your model;
   - `app.js`: one line to mount your router;
   - `package.json`: add your dependencies.
-- **Don't invent** routes, fields, file names or packages that aren't in the docs.
+- **Don't invent** routes, fields, file names or packages that aren't in `docs/design.md`.
 - Logic goes in **plain functions** that are easy to unit test. Anything needing the
   database takes it as an argument.
 - **Every part has Vitest unit tests** that need no database, no server and no internet.
@@ -67,73 +65,15 @@ If code and docs disagree, fix one of them in the same change.
 
 ## Current status (22 Nov 2026)
 
-**Done:**
+**The first version is complete and merged into `main`** (PRs #1 to #14): all four backend
+parts, their tests (`npm test`: 12 files, 45 passed) and the frontend. `docs/design.md` §13
+says who built what. The step-by-step checklist and the per-person docs have been removed;
+they are in the git history if needed.
 
-- [x] All docs written and approved by Nitesh.
-- [x] Repo created locally and pushed to https://github.com/niteshkumar7557/trellis-map
-  (`main`). It contains `docs/`, `.gitignore` and `docker-compose.yml` (Postgres 18 on
-  port 5433).
-- [x] **Day 1 is complete.**
-  - Parts 1, 2 and 4 are merged into `main` (PRs #1 to #3). Gate A is open.
-  - The frontend skeleton (N.1) is in `frontend/`: Vite + React, the `/api` proxy,
-    `src/api.js`, and the Login and Sign up screens.
-
-- [x] **Day 2 is complete.**
-  - Parts 1, 2 and 4 are merged into `main` (PRs #6 to #8). Gates B and C are open.
-  - Part 3 (3.1 and 3.2) is merged into `main` (PR #9): refresh with rotation, logout and
-    Google sign-in, with `startSession` swapped into signup and login, and its tests. It
-    also adds the missing `progress` migration.
-  - The frontend screens (N.2) are merged into `main` (PR #11): the map, the topic panel
-    and the admin screen, wired to the real API.
-
-- [x] **Day 3 building is complete.**
-  - 1.8 (admin `POST` and `PUT` for topics) is merged into `main` (PR #12).
-  - 1.9 (the error handler test) is on `part-1-topics`. `npm test`: 12 files, 45 passed.
-  - Fixed: unknown routes gave 401, not 404; `requireAuth` is now applied per route
-    (PR #13). `GET /api/subjects/:id/next` gave 500 (PR #10).
-
-**Next:** the viva deadline has been extended, so new features come next. Add each one to
-`docs/design.md` and `docs/checklist.md` before building it. (Running everything,
-rehearsing the demo and practising the answers the team does on its own, outside the
-checklist.)
-
-## Future work, in order (details in `docs/checklist.md`)
-
-**Nitesh, before the session (checklist step 0):**
-
-- [x] 0.1: add Riya, Nihamika and Mansha as collaborators on GitHub.
-- [x] 0.2: Google OAuth credentials, with every teammate's Gmail and the demo account as
-  **test users**. The redirect URI is `http://localhost:5173/api/auth/google/callback`.
-- [x] 0.3: a Groq API key and a `JWT_ACCESS_SECRET`.
-- [x] 0.4: send each teammate the filled-in `.env` privately.
-
-**Day 1 (18 Nov):**
-
-- [x] Everyone sets up their laptop (0.5 to 0.7).
-- [x] Nihamika: 1.1 to 1.4. This opens **gate A**, which everyone waits on.
-- [x] Riya: 2.1 to 2.3.
-- [x] Mansha: 4.1 to 4.3.
-- [x] Nitesh: N.1, the frontend skeleton.
-
-**Day 2 (19 Nov):**
-
-- [x] Nihamika: 1.5 to 1.7. This opens **gate B**.
-- [x] Riya: 2.4 and 2.5. This opens **gate C**.
-- [x] Mansha: 4.4 to 4.6.
-- [x] Nitesh: 3.1 (Part 3, after gate C).
-- [x] Nitesh: N.2 (the frontend screens).
-
-**Day 3 (20 Nov):**
-
-- [x] Nihamika: 1.8 and 1.9.
-- [x] Nitesh: 3.2 (Part 3 tests) and merge every open PR.
-
-**If time runs out, cut in this order:**
-
-1. Admin `PUT`.
-2. Google sign-in.
-3. The AI route.
+**Next:** the viva deadline has been extended, so the team will add new features. Add each
+feature to `docs/design.md` (what it does, its routes and fields, who owns it) before
+building it, on that owner's branch.
 
 ## Keep this file current
 
-When a step is done, tick it here and in `docs/checklist.md`, and update "Current status".
+When a feature is done, update "Current status" here and `docs/design.md`.
