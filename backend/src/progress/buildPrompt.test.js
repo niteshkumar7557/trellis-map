@@ -82,5 +82,62 @@ describe("buildPrompt", () => {
     expect(prompt).toContain("I'm stuck on this. Start with what I may be missing: Comparison and logical operators.");
     expect(prompt).toContain("Teach me in small steps and ask me one question after each step. Don't lecture.");
   });
+
+  it("builds a complete prompt for a React fundamentals topic with prerequisites and mistakes", () => {
+    const reactTopic = {
+      id: 10,
+      name: "Side effects and synchronization (useEffect)",
+      summary: "useEffect lifecycle, dependency array, cleanup functions, and synchronizing with external systems",
+      mistakes: [
+        "Omitting reactive values from the useEffect dependency array",
+        "Using useEffect for calculating derived state instead of doing it during render",
+      ],
+    };
+
+    const prereqs = [
+      { id: 6, name: "State and snapshots (useState)" },
+      { id: 7, name: "Render, commit and reconciliation" },
+    ];
+
+    const prompt = buildPrompt({
+      subjectName: "React fundamentals",
+      topic: reactTopic,
+      prereqs,
+      statusById: { 10: "STUCK", 6: "DONE", 7: "NOT_STARTED" },
+      note: "Cleanup function order is confusing",
+      hint: { topicId: 7, name: "Render, commit and reconciliation" },
+    });
+
+    expect(prompt).toContain(
+      "I'm learning React fundamentals. The topic is Side effects and synchronization (useEffect): useEffect lifecycle, dependency array, cleanup functions, and synchronizing with external systems."
+    );
+    expect(prompt).toContain("I'm comfortable with: State and snapshots (useState).");
+    expect(prompt).toContain("I'm not solid on yet: Render, commit and reconciliation.");
+    expect(prompt).toContain("My note: Cleanup function order is confusing.");
+    expect(prompt).toContain(
+      "Common mistakes to watch for: Omitting reactive values from the useEffect dependency array, Using useEffect for calculating derived state instead of doing it during render."
+    );
+    expect(prompt).toContain("I'm stuck on this. Start with what I may be missing: Render, commit and reconciliation.");
+    expect(prompt).toContain("Teach me in small steps and ask me one question after each step. Don't lecture.");
+    expect(prompt).toContain("When we finish, give me two lines: what I understood, and what is still unclear.");
+  });
+
+  it("builds a prompt for a completed React topic with quiz instruction", () => {
+    const reactTopic = {
+      id: 1,
+      name: "JSX and React elements",
+      summary: "JSX syntax, React.createElement, embedding expressions, and element trees",
+      mistakes: ["Returning multiple adjacent root elements without a fragment"],
+    };
+
+    const prompt = buildPrompt({
+      subjectName: "React fundamentals",
+      topic: reactTopic,
+      statusById: { 1: "DONE" },
+    });
+
+    expect(prompt).toContain("I'm learning React fundamentals. The topic is JSX and React elements");
+    expect(prompt).toContain("I think I know this. Quiz me first and only teach what I get wrong.");
+  });
 });
 

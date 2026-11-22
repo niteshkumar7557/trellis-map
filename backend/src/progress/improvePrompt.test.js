@@ -79,4 +79,31 @@ describe("improvePrompt", () => {
       improved: false,
     });
   });
+
+  it("improves a prompt built from React fundamentals data", async () => {
+    const reactTemplate =
+      "I'm learning React fundamentals. The topic is Side effects and synchronization (useEffect). I'm stuck on this. Start with what I may be missing: Reconciliation.";
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          choices: [
+            {
+              message: {
+                content:
+                  "I'm studying React fundamentals, focusing on Effects. Let's start with Reconciliation before tackling cleanup functions.",
+              },
+            },
+          ],
+        }),
+      })
+    );
+
+    const result = await improvePrompt(reactTemplate);
+    expect(result.improved).toBe(true);
+    expect(result.prompt).toContain("React fundamentals");
+  });
 });
