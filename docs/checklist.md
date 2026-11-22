@@ -431,7 +431,7 @@ one-minute answer (at the end of this doc).
 
 ### Building (first hour)
 
-- [ ] **1.8 Nihamika: the admin routes (after gate C).**
+- [x] **1.8 Nihamika: the admin routes (after gate C).**
 
   Prompt:
   ```
@@ -448,7 +448,7 @@ one-minute answer (at the end of this doc).
 
   **Commit:** `feat(topics): admin routes to add and edit topics`
 
-- [ ] **1.9 Nihamika: the error handler test.**
+- [x] **1.9 Nihamika: the error handler test.**
 
   Prompt:
   ```

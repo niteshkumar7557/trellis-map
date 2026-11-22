@@ -65,7 +65,7 @@ If code and docs disagree, fix one of them in the same change.
 - **No co-author lines** in commit messages (no `Co-Authored-By`).
 - Commit, push or merge only when the person you're working for asks.
 
-## Current status (21 Nov 2026)
+## Current status (22 Nov 2026)
 
 **Done:**
 
@@ -83,15 +83,18 @@ If code and docs disagree, fix one of them in the same change.
   - Part 3 (3.1 and 3.2) is merged into `main` (PR #9): refresh with rotation, logout and
     Google sign-in, with `startSession` swapped into signup and login, and its tests. It
     also adds the missing `progress` migration.
-  - The frontend screens (N.2) are on the `frontend` branch: the map, the topic panel and
-    the admin screen, wired to the real API. The admin screen's save needs 1.8.
+  - The frontend screens (N.2) are merged into `main` (PR #11): the map, the topic panel
+    and the admin screen, wired to the real API.
 
-**Next:** 1.8 and 1.9, then 5.1 to 5.4 (Day 3 is running a day late). Known issues:
+- [x] **Day 3 building is complete.**
+  - 1.8 (admin `POST` and `PUT` for topics) is merged into `main` (PR #12).
+  - 1.9 (the error handler test) is on `part-1-topics`. `npm test`: 12 files, 45 passed.
+  - Fixed: unknown routes gave 401, not 404; `requireAuth` is now applied per route
+    (PR #13). `GET /api/subjects/:id/next` gave 500 (PR #10).
 
-- `progressRouter.use(requireAuth)` covers all of `/api`, so unknown routes give 401, not
-  404. Mansha fixes it on a `fix/...` branch.
-- `GET /api/subjects/:id/next` gave 500: `getNextTopic` passed `{ subject, topics }` to
-  `findNextTopic`. Fixed on `fix/next-topic`.
+**Next:** 5.1 to 5.4 (run everything, rehearse the demo, practise the answers). The viva
+deadline has been extended, so new features come after 5.1 to 5.4; add them to
+`docs/design.md` and `docs/checklist.md` before building them.
 
 ## Future work, in order (details in `docs/checklist.md`)
 
@@ -121,7 +124,7 @@ If code and docs disagree, fix one of them in the same change.
 
 **Day 3 (20 Nov):**
 
-- [ ] Nihamika: 1.8 and 1.9.
+- [x] Nihamika: 1.8 and 1.9.
 - [x] Nitesh: 3.2 (Part 3 tests) and merge every open PR.
 - [ ] Everyone: 5.1 to 5.4 (run everything, rehearse the demo, practise the one-minute
   answers).
