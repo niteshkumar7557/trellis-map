@@ -429,9 +429,9 @@ one-minute answer (at the end of this doc).
 
 # Day 3 (20 Nov)
 
-### Building (first hour)
+### Building
 
-- [ ] **1.8 Nihamika: the admin routes (after gate C).**
+- [x] **1.8 Nihamika: the admin routes (after gate C).**
 
   Prompt:
   ```
@@ -448,7 +448,7 @@ one-minute answer (at the end of this doc).
 
   **Commit:** `feat(topics): admin routes to add and edit topics`
 
-- [ ] **1.9 Nihamika: the error handler test.**
+- [x] **1.9 Nihamika: the error handler test.**
 
   Prompt:
   ```
@@ -460,27 +460,6 @@ one-minute answer (at the end of this doc).
 
   Push and open a PR.
 - [x] **3.2 Nitesh: Part 3 tests**, `nitesh.md` §2 step 6. Push and merge every open PR.
-
-### Everyone together (second hour)
-
-- [ ] **5.1 Everyone: pull and run everything.**
-
-  ```bash
-  git checkout main && git pull
-  cd backend && npm install
-  npx prisma migrate reset     # answer yes; it re-seeds
-  npm test
-  ```
-
-  **Check:** every test file passes, 0 failed.
-- [ ] **5.2 Everyone: the demo, once through on Nitesh's laptop.** Follow `nitesh.md` §4.
-  Fix anything that breaks, on a `fix/...` branch.
-- [ ] **5.3 Everyone: practise your one-minute answer** (below) out loud, twice. Then
-  ask each other the questions from your own doc's "Viva questions" list.
-- [ ] **5.4 Nitesh: the night before.**
-  - Run the demo again from a fresh `migrate reset`.
-  - Check that the Google sign-in still works.
-  - Have `npm test` ready in a terminal tab.
 
 ---
 
