@@ -294,7 +294,68 @@ export const REACT_SUBJECT = {
   description: "Learn React fundamentals, component architecture, hooks, and state in topic order.",
 };
 
-export const REACT_TOPICS = [];
+export const REACT_TOPICS = [
+  {
+    slug: "jsx",
+    name: "JSX and React elements",
+    summary: "JSX syntax, React.createElement, embedding expressions, and element trees",
+    mistakes: [
+      "Treating JSX as HTML strings instead of syntactic sugar for React.createElement",
+      "Returning multiple adjacent root elements without a fragment",
+    ],
+    needs: [],
+  },
+  {
+    slug: "components",
+    name: "Functional components and pure rendering",
+    summary: "Functional components, pure rendering rules, and rendering versus DOM mutation",
+    mistakes: [
+      "Mutating external variables or DOM directly inside the render body",
+      "Calling components as plain functions instead of JSX tags",
+    ],
+    needs: ["jsx"],
+  },
+  {
+    slug: "props",
+    name: "Props and component composition",
+    summary: "Passing props, children prop, read-only props, and component composition",
+    mistakes: [
+      "Mutating props directly inside the child component",
+      "Confusing children prop composition with inheritance",
+    ],
+    needs: ["components"],
+  },
+  {
+    slug: "events",
+    name: "Event handling and synthetic events",
+    summary: "SyntheticEvent wrapper, inline vs named handlers, passing arguments, and default prevention",
+    mistakes: [
+      "Invoking the event handler immediately in JSX instead of passing a function reference (onClick={fn()})",
+      "Expecting synthetic events to work identically to native DOM events in asynchronous callbacks",
+    ],
+    needs: ["components"],
+  },
+  {
+    slug: "lists-and-keys",
+    name: "Conditional and list rendering (keys)",
+    summary: "Array mapping to JSX, stable key props, ternary and && conditional rendering",
+    mistakes: [
+      "Using array indexes as keys for dynamically reordered or filtered lists",
+      "Rendering 0 or empty arrays with && and accidentally displaying 0 in the UI",
+    ],
+    needs: ["props"],
+  },
+  {
+    slug: "state",
+    name: "State and snapshots (useState)",
+    summary: "useState hook, state as a snapshot, updater functions, and re-rendering triggers",
+    mistakes: [
+      "Mutating state objects or arrays in-place instead of creating new copies",
+      "Reading state immediately after set state and expecting the new value synchronously",
+    ],
+    needs: ["components", "events"],
+  },
+];
 
 /**
  * Upserts a subject, its topics, and prerequisite links.
