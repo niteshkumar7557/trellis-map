@@ -1,6 +1,12 @@
 import { prisma } from "../src/lib/prisma.js";
 
-const TOPICS = [
+export const JAVASCRIPT_SUBJECT = {
+  slug: "javascript",
+  name: "JavaScript fundamentals",
+  description: "Learn JavaScript fundamentals in topic order.",
+};
+
+export const JAVASCRIPT_TOPICS = [
   {
     slug: "variables",
     name: "Variables and types",
@@ -153,25 +159,156 @@ const TOPICS = [
   },
 ];
 
-async function main() {
-  // 1. Upsert the subject "javascript"
-  const subject = await prisma.subject.upsert({
-    where: { slug: "javascript" },
+export const MONGODB_SUBJECT = {
+  slug: "mongodb",
+  name: "MongoDB fundamentals",
+  description: "Learn MongoDB fundamentals, document modeling, queries, and aggregations in topic order.",
+};
+
+export const MONGODB_TOPICS = [
+  {
+    slug: "documents",
+    name: "Documents and BSON",
+    summary: "Documents, collections, JSON vs BSON, and field types (ObjectId, string, number, date)",
+    mistakes: [
+      "Thinking MongoDB is schemaless with no structure needed",
+      "using strings for IDs instead of ObjectId",
+    ],
+    needs: [],
+  },
+  {
+    slug: "crud-insert",
+    name: "Inserting documents",
+    summary: "insertOne, insertMany, auto-generated _id, and write concern basics",
+    mistakes: [
+      "Re-inserting the same _id and hitting duplicate key errors",
+      "expecting insertMany to roll back on partial failure without transactions",
+    ],
+    needs: ["documents"],
+  },
+  {
+    slug: "crud-find",
+    name: "Querying documents",
+    summary: "find, findOne, query filters, equality, and projections",
+    mistakes: [
+      "Omitting projection for unwanted fields",
+      "confusing query filter syntax with projection syntax",
+    ],
+    needs: ["documents"],
+  },
+  {
+    slug: "comparison-operators",
+    name: "Comparison and logical operators",
+    summary: "$eq, $ne, $gt, $gte, $lt, $lte, $in, $and, $or, $nor",
+    mistakes: [
+      "Forgetting that $in takes an array",
+      "wrapping multiple fields in $and when implicit AND works",
+    ],
+    needs: ["crud-find"],
+  },
+  {
+    slug: "nested-documents",
+    name: "Embedded documents and dot notation",
+    summary: "Querying and updating nested fields with dot notation and nested object equality",
+    mistakes: [
+      "Matching an entire subdocument when matching a single nested field was intended",
+      'forgetting quotes in dot notation ("address.city")',
+    ],
+    needs: ["crud-find"],
+  },
+  {
+    slug: "crud-update",
+    name: "Updating documents",
+    summary: "updateOne, updateMany, replaceOne, and field update operators ($set, $unset, $inc)",
+    mistakes: [
+      "Forgetting $set and accidentally replacing the entire document",
+      "assuming updateOne updates all matching rows",
+    ],
+    needs: ["crud-find"],
+  },
+  {
+    slug: "arrays-query",
+    name: "Querying arrays",
+    summary: "Array field queries, $all, $size, $elemMatch, and element querying",
+    mistakes: [
+      "Expecting multiple conditions on array elements to match the same element without $elemMatch",
+      "checking array length with comparison operators instead of $size",
+    ],
+    needs: ["nested-documents"],
+  },
+  {
+    slug: "array-updates",
+    name: "Updating arrays",
+    summary: "Array update operators: $push, $pull, $addToSet, and the positional operator ($)",
+    mistakes: [
+      "Using $push when avoiding duplicates requires $addToSet",
+      "mutating the wrong array element with improper positional operators",
+    ],
+    needs: ["crud-update", "arrays-query"],
+  },
+  {
+    slug: "crud-delete",
+    name: "Deleting documents",
+    summary: "deleteOne, deleteMany, and drop collection",
+    mistakes: [
+      "Calling deleteMany with an empty filter and wiping all documents",
+      "confusing drop collection with deleting documents",
+    ],
+    needs: ["crud-find"],
+  },
+  {
+    slug: "indexes",
+    name: "Indexes and performance",
+    summary: "Single field indexes, compound indexes, explain(), and COLLSCAN vs IXSCAN",
+    mistakes: [
+      "Creating too many indexes and slowing down writes",
+      "indexing fields in compound indexes in an order that violates equality-sort-range rules",
+    ],
+    needs: ["crud-find"],
+  },
+  {
+    slug: "aggregation-pipeline",
+    name: "Aggregation pipeline basics",
+    summary: "Pipeline concept, $match, $project, $limit, $skip, and $sort",
+    mistakes: [
+      "Putting $project before $match and preventing index usage",
+      "confusing find() filters with aggregation stage syntax",
+    ],
+    needs: ["comparison-operators"],
+  },
+  {
+    slug: "aggregation-group",
+    name: "Grouping and transforming",
+    summary: "$group, accumulator expressions ($sum, $avg, $push), and $unwind",
+    mistakes: [
+      "Forgetting that _id is required in $group",
+      "expecting $unwind to keep empty arrays without preserveNullAndEmptyArrays",
+    ],
+    needs: ["aggregation-pipeline", "array-updates"],
+  },
+];
+
+/**
+ * Upserts a subject, its topics, and prerequisite links.
+ * Preserves existing topic IDs and user progress records.
+ */
+export async function seedSubject(db, subjectData, topics) {
+  const subject = await db.subject.upsert({
+    where: { slug: subjectData.slug },
     update: {
-      name: "JavaScript fundamentals",
-      description: "Learn JavaScript fundamentals in topic order.",
+      name: subjectData.name,
+      description: subjectData.description,
     },
     create: {
-      slug: "javascript",
-      name: "JavaScript fundamentals",
-      description: "Learn JavaScript fundamentals in topic order.",
+      slug: subjectData.slug,
+      name: subjectData.name,
+      description: subjectData.description,
     },
   });
 
-  // 2. Upsert every topic for this subject
   const topicMap = new Map();
-  for (const t of TOPICS) {
-    const topic = await prisma.topic.upsert({
+  for (const t of topics) {
+    const topic = await db.topic.upsert({
       where: {
         subjectId_slug: {
           subjectId: subject.id,
@@ -194,8 +331,8 @@ async function main() {
     topicMap.set(t.slug, topic);
   }
 
-  // 3. Delete this subject's TopicPrerequisite rows and recreate them from "needs"
-  await prisma.topicPrerequisite.deleteMany({
+  // Delete only this subject's TopicPrerequisite links so progress and other subjects remain intact
+  await db.topicPrerequisite.deleteMany({
     where: {
       topic: {
         subjectId: subject.id,
@@ -204,26 +341,39 @@ async function main() {
   });
 
   const prereqRows = [];
-  for (const t of TOPICS) {
+  for (const t of topics) {
     const topicId = topicMap.get(t.slug).id;
     for (const needSlug of t.needs) {
-      const prerequisiteId = topicMap.get(needSlug).id;
-      prereqRows.push({ topicId, prerequisiteId });
+      const prerequisite = topicMap.get(needSlug);
+      if (prerequisite) {
+        prereqRows.push({ topicId, prerequisiteId: prerequisite.id });
+      }
     }
   }
 
-  await prisma.topicPrerequisite.createMany({
-    data: prereqRows,
-  });
+  if (prereqRows.length > 0) {
+    await db.topicPrerequisite.createMany({
+      data: prereqRows,
+    });
+  }
 
-  console.log(`Seeded ${TOPICS.length} topics and ${prereqRows.length} prerequisite links for ${subject.slug}.`);
+  console.log(`Seeded ${topics.length} topics and ${prereqRows.length} prerequisite links for ${subject.slug}.`);
+  return { subject, topicCount: topics.length, prereqCount: prereqRows.length };
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+async function main() {
+  await seedSubject(prisma, JAVASCRIPT_SUBJECT, JAVASCRIPT_TOPICS);
+  await seedSubject(prisma, MONGODB_SUBJECT, MONGODB_TOPICS);
+}
+
+// Run when called directly by "node prisma/seed.js"
+if (process.argv[1]?.endsWith("seed.js")) {
+  main()
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}

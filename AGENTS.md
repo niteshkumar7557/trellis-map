@@ -8,7 +8,8 @@ Antigravity for Riya, Nihamika and Mansha.
 **Trellis** is a study planner built around a map of topics, for a backend course's
 end-of-semester viva.
 
-- It shows the topics of **JavaScript fundamentals** in learning order and the next topic.
+- It shows the topics of **JavaScript fundamentals** and **MongoDB fundamentals** in
+  learning order and the next topic.
 - When a topic is marked Stuck, it says which earlier topic "may be" the cause.
 - It builds a prompt for the student's own AI, with an optional "Improve with AI" through
   Groq.
@@ -72,6 +73,10 @@ they are in the git history if needed.
 
 **Frontend redesign (22 Nov 2026), branch `frontend-design-system`:** a design system with
 light and dark mode (`docs/design.md` §15). Frontend only; no backend changes.
+
+**MongoDB fundamentals (22 Nov 2026), branch `feat/mongodb-subject`:** added MongoDB fundamentals
+as a second subject with 12 topics, DAG validation, repeatable multi-subject seed, and
+subject selection in the frontend map and admin views. All 13 test files passed (50 tests total).
 
 **Next:** the viva deadline has been extended, so the team will add new features. Add each
 feature to `docs/design.md` (what it does, its routes and fields, who owns it) before

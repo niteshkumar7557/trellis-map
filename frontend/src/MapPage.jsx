@@ -14,7 +14,8 @@ function nameList(list) {
 }
 
 // The map: the subject's topics in learning order, one row per level.
-export default function MapPage({ user }) {
+// selectedSubjectId is controlled by App.jsx (via the header tabs).
+export default function MapPage({ user, selectedSubjectId }) {
   const [subject, setSubject] = useState(null);
   const [topics, setTopics] = useState([]);
   const [statusById, setStatusById] = useState({});
@@ -23,8 +24,7 @@ export default function MapPage({ user }) {
   const [selectedId, setSelectedId] = useState(null);
   const [error, setError] = useState("");
 
-  // Progress and the next topic change whenever a status is saved, so they reload
-  // together. The topics themselves don't change while the page is open.
+  // Progress and next-topic reload together whenever a status is saved.
   const loadProgress = useCallback(async (subjectId) => {
     const [{ progress }, { next }] = await Promise.all([
       apiFetch(`/api/subjects/${subjectId}/progress`),
@@ -35,22 +35,34 @@ export default function MapPage({ user }) {
     setNext(next);
   }, []);
 
+  // Reload topics and progress whenever the selected subject changes.
   useEffect(() => {
+    if (!selectedSubjectId) return;
+
+    let cancelled = false;
     async function load() {
       try {
-        // There is one subject for now: JavaScript fundamentals.
-        const { subjects } = await apiFetch("/api/subjects");
-        if (subjects.length === 0) throw new Error("No subjects yet. Run the seed.");
-        const data = await apiFetch(`/api/subjects/${subjects[0].id}/topics`);
+        setError("");
+        setSelectedId(null);
+        setSubject(null);
+        setTopics([]);
+        setStatusById({});
+        setNoteById({});
+        setNext(undefined);
+
+        const data = await apiFetch(`/api/subjects/${selectedSubjectId}/topics`);
+        if (cancelled) return;
         setSubject(data.subject);
         setTopics(data.topics);
-        await loadProgress(data.subject.id);
+        await loadProgress(selectedSubjectId);
       } catch (err) {
-        setError(err.message);
+        if (!cancelled) setError(err.message);
       }
     }
+
     load();
-  }, [loadProgress]);
+    return () => { cancelled = true; };
+  }, [selectedSubjectId, loadProgress]);
 
   if (error) {
     return (
@@ -70,7 +82,7 @@ export default function MapPage({ user }) {
   const doneCount = topicsWith("DONE").length;
   const firstName = user.name.split(" ")[0];
 
-  // Group the topics into rows by level. They arrive in learning order already.
+  // Group topics into rows by level. They arrive in learning order already.
   const levels = [];
   for (const topic of topics) {
     (levels[topic.level] ??= []).push(topic);
@@ -163,7 +175,6 @@ export default function MapPage({ user }) {
 
       {selected && (
         <TopicPanel
-          // A new key per topic, so the note box and prompt start fresh.
           key={selected.id}
           topic={selected}
           topicsById={topicsById}
