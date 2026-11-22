@@ -37,8 +37,9 @@ AI feature only rewrites the prompt; it never explains the topic.
 1. Sign up and log in with email and password, or with Google.
 2. A short-lived access token plus a refresh token in a cookie; logout really ends the
    session.
-3. Two subjects, **JavaScript fundamentals** (15 topics) and **MongoDB fundamentals** (12
-   topics), with "needs" links between them, loaded by a seed script.
+3. Three subjects, **JavaScript fundamentals** (15 topics), **MongoDB fundamentals** (12
+   topics), and **React fundamentals** (16 topics), with "needs" links between them, loaded by a
+   seed script.
 4. Subject switcher allowing students and admins to choose between subjects.
 5. Topics shown in learning order (grouped by level).
 6. A status on each topic: Not started, Learning, Done, Stuck. Plus a short note.
@@ -51,8 +52,8 @@ AI feature only rewrites the prompt; it never explains the topic.
 12. Rate limiting on login and on the AI route.
 13. Unit tests (Vitest) for every part.
 
-**Out (on purpose):** a chat, quizzes, explanations, third-party subjects beyond JS and
-MongoDB, topics inside topics, password reset, email, deleting your account, deployment. The
+**Out (on purpose):** a chat, quizzes, explanations, third-party subjects beyond JS,
+MongoDB, and React, topics inside topics, password reset, email, deleting your account, deployment. The
 app runs on our laptops for the demo.
 
 ## 3. Tech stack and why
@@ -440,6 +441,27 @@ mistakes.
 | 10 | `indexes` | Indexes and performance | crud-find | Single field indexes, compound indexes, explain(), and COLLSCAN vs IXSCAN | Creating too many indexes and slowing down writes; indexing fields in compound indexes in an order that violates equality-sort-range rules |
 | 11 | `aggregation-pipeline` | Aggregation pipeline basics | comparison-operators | Pipeline concept, $match, $project, $limit, $skip, and $sort | Putting $project before $match and preventing index usage; confusing find() filters with aggregation stage syntax |
 | 12 | `aggregation-group` | Grouping and transforming | aggregation-pipeline, array-updates | $group, accumulator expressions ($sum, $avg, $push), and $unwind | Forgetting that _id is required in $group; expecting $unwind to keep empty arrays without preserveNullAndEmptyArrays |
+
+### 9.3 React fundamentals
+
+| # | slug | Topic | Needs | Summary | Common mistakes |
+|---|---|---|---|---|---|
+| 1 | `jsx` | JSX and React elements | none | JSX syntax, React.createElement, embedding expressions, and element trees | Treating JSX as HTML strings instead of syntactic sugar for React.createElement; returning multiple adjacent root elements without a fragment |
+| 2 | `components` | Functional components and pure rendering | jsx | Functional components, pure rendering rules, and rendering versus DOM mutation | Mutating external variables or DOM directly inside the render body; calling components as plain functions instead of JSX tags |
+| 3 | `props` | Props and component composition | components | Passing props, children prop, read-only props, and component composition | Mutating props directly inside the child component; confusing children prop composition with inheritance |
+| 4 | `events` | Event handling and synthetic events | components | SyntheticEvent wrapper, inline vs named handlers, passing arguments, and default prevention | Invoking the event handler immediately in JSX instead of passing a function reference (onClick={fn()}); expecting synthetic events to work identically to native DOM events in asynchronous callbacks |
+| 5 | `lists-and-keys` | Conditional and list rendering (keys) | props | Array mapping to JSX, stable key props, ternary and && conditional rendering | Using array indexes as keys for dynamically reordered or filtered lists; rendering 0 or empty arrays with && and accidentally displaying 0 in the UI |
+| 6 | `state` | State and snapshots (`useState`) | components, events | useState hook, state as a snapshot, updater functions, and re-rendering triggers | Mutating state objects or arrays in-place instead of creating new copies; reading state immediately after set state and expecting the new value synchronously |
+| 7 | `reconciliation` | Render, commit and reconciliation | lists-and-keys, state | Virtual DOM diffing, render and commit phases, component identity by position and key | Assuming state updates immediately touch the real DOM; resetting component state unexpectedly due to redefining component functions inside parent render |
+| 8 | `controlled-inputs` | Controlled and uncontrolled inputs | state, events | Controlled input value and onChange binding, defaultValue, and form state handling | Switching an input from uncontrolled to controlled by passing undefined value; updating controlled input value without providing an onChange handler |
+| 9 | `lifting-state` | Lifting state and derived state | props, state | Sharing state between siblings via common ancestor and calculating derived values during render | Duplicating derived state into useState instead of computing it during render; passing down state setters through excessive layers when state belongs higher or lower |
+| 10 | `effects` | Side effects and synchronization (`useEffect`) | state, reconciliation | useEffect lifecycle, dependency array, cleanup functions, and synchronizing with external systems | Omitting reactive values from the useEffect dependency array; using useEffect for calculating derived state instead of doing it during render |
+| 11 | `refs` | Refs and escape hatches (`useRef`) | reconciliation | useRef for persistent mutable values without triggering re-render, and DOM node references | Reading or writing ref.current during rendering rather than in effects or event handlers; using useRef when changing values should cause the UI to re-render |
+| 12 | `use-reducer` | Complex state with `useReducer` | lifting-state | useReducer hook, actions, dispatch, and predictable multi-step state transitions | Performing side effects or mutating previous state directly inside the reducer function; overcomplicating simple isolated states that only require useState |
+| 13 | `context` | Context API and avoiding prop drilling | props, lifting-state | createContext, Provider, useContext, and broadcasting global state across the tree | Putting high-frequency changing state into context causing unwanted re-renders across consumers; using Context as a replacement for component composition |
+| 14 | `custom-hooks` | Custom hooks and logic reuse | effects, refs | Extracting reusable stateful logic into custom use* functions following hooks rules | Thinking custom hooks share state values rather than state logic between component instances; violating rules of hooks by calling hooks conditionally inside custom hooks |
+| 15 | `error-boundaries` | Error boundaries and async UI states | effects, props | Class component error boundaries, getDerivedStateFromError, componentDidCatch, and suspense/loading fallbacks | Expecting error boundaries to catch errors inside event handlers or asynchronous callbacks; forgetting fallback UI leaving a blank screen when render crashes |
+| 16 | `memoization` | Rendering performance and memoization | reconciliation, custom-hooks | React.memo, useMemo, useCallback, and optimizing costly renders and object identity | Prematurely wrapping cheap computations in useMemo adding unnecessary overhead; passing unstable inline object or function references defeating React.memo and useCallback |
 
 ## 10. Environment variables (`backend/.env`)
 
