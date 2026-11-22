@@ -92,9 +92,10 @@ If code and docs disagree, fix one of them in the same change.
   - Fixed: unknown routes gave 401, not 404; `requireAuth` is now applied per route
     (PR #13). `GET /api/subjects/:id/next` gave 500 (PR #10).
 
-**Next:** 5.1 to 5.4 (run everything, rehearse the demo, practise the answers). The viva
-deadline has been extended, so new features come after 5.1 to 5.4; add them to
-`docs/design.md` and `docs/checklist.md` before building them.
+**Next:** the viva deadline has been extended, so new features come next. Add each one to
+`docs/design.md` and `docs/checklist.md` before building it. (Running everything,
+rehearsing the demo and practising the answers the team does on its own, outside the
+checklist.)
 
 ## Future work, in order (details in `docs/checklist.md`)
 
@@ -126,8 +127,6 @@ deadline has been extended, so new features come after 5.1 to 5.4; add them to
 
 - [x] Nihamika: 1.8 and 1.9.
 - [x] Nitesh: 3.2 (Part 3 tests) and merge every open PR.
-- [ ] Everyone: 5.1 to 5.4 (run everything, rehearse the demo, practise the one-minute
-  answers).
 
 **If time runs out, cut in this order:**
 
