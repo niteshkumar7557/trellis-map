@@ -1,0 +1,811 @@
+/*
+  The frame and the four screens: login, the map, the topic panel and admin.
+
+  Layout arithmetic (desktop): the content column is 1180px.
+  - Counts: 4 x 283 + 3 x 16 = 1180.
+  - Map with a topic open: 764 + 16 + 400 = 1180.
+  - Admin: a 360px label column, a 48px gap, and the panel takes the rest (772).
+*/
+
+.center {
+  padding: 64px 16px;
+  text-align: center;
+}
+
+/* ---- The frame: header on the tinted chrome, the screen on a white sheet ---- */
+
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 56px;
+  padding: 0 24px 0 32px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  font-weight: 600;
+  font-size: var(--fs-section);
+  text-decoration: none;
+}
+
+.brand-mark {
+  width: 22px;
+  height: 22px;
+  fill: var(--accent);
+}
+
+.header-nav {
+  display: flex;
+  gap: 4px;
+}
+
+/* The current screen is a neutral pill; no colour on the chrome. */
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-chip);
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+
+.nav-link:hover {
+  color: var(--text);
+}
+
+.nav-link.active {
+  background: var(--active);
+  color: var(--text);
+}
+
+.header-end {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.header-user {
+  padding: 0 4px;
+  color: var(--muted);
+}
+
+.sheet {
+  flex: 1;
+  margin: 0 8px 8px;
+  background: var(--ground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sheet);
+}
+
+.page {
+  max-width: calc(var(--column) + 2 * var(--page-pad));
+  margin: 0 auto;
+  padding: 40px var(--page-pad) 64px;
+}
+
+/* ---- The title row every screen opens with ---- */
+
+.title-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.greeting {
+  font-family: var(--font-display);
+  font-size: var(--fs-greeting);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+.title-sub {
+  margin-top: 8px;
+}
+
+/* ---- Panels: one tonal step off the sheet, nothing else ---- */
+
+.panel {
+  padding: var(--pad);
+  background: var(--surface);
+  border-radius: var(--radius-panel);
+}
+
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* ---- The map screen ---- */
+
+.map-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gap);
+  align-items: start;
+}
+
+@media (min-width: 64rem) {
+  .map-layout.has-panel {
+    grid-template-columns: minmax(0, 1fr) 400px;
+  }
+
+  .map-layout > .title-row,
+  .map-layout > .progress-strip,
+  .map-layout > .counts {
+    grid-column: 1 / -1;
+  }
+
+  .map-layout.has-panel > .topic-panel {
+    grid-column: 2;
+    grid-row: 4;
+    position: sticky;
+    top: 16px;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+  }
+}
+
+/* Fifteen cells, one per topic, coloured by status */
+.progress-strip {
+  display: flex;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.strip-cell {
+  flex: 1;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--active);
+}
+
+.strip-cell.status-DONE {
+  background: var(--done);
+}
+
+.strip-cell.status-LEARNING {
+  background: var(--learning-mark);
+}
+
+.strip-cell.status-STUCK {
+  background: var(--stuck);
+}
+
+/* The four counts: also the legend for the map's colours */
+.counts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.count {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  min-height: 128px;
+  padding: 16px;
+  background: var(--surface);
+  border-radius: var(--radius-panel);
+}
+
+.count-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.count-value {
+  font-size: var(--fs-figure);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.count-caption {
+  overflow: hidden;
+  font-size: var(--fs-small);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.map-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-small);
+}
+
+.needed-swatch {
+  width: 18px;
+  height: 12px;
+  border: 2px dashed var(--muted);
+  border-radius: 4px;
+}
+
+/* The trellis: each step is a row tied onto one stem */
+.trellis {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trellis-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  padding-bottom: 16px;
+}
+
+.trellis-row:last-child {
+  padding-bottom: 0;
+}
+
+/* The stem, from this row's knot down to the next one */
+.trellis-row::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 22px;
+  bottom: -14px;
+  width: 2px;
+  background: var(--border);
+}
+
+.trellis-row:last-child::before {
+  display: none;
+}
+
+.trellis-step {
+  position: relative;
+  padding: 12px 0 0 22px;
+  color: var(--muted);
+  font-size: var(--fs-small);
+  font-weight: 500;
+}
+
+/* The knot: hollow while a step has work left, filled once it is all done */
+.trellis-step::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 14px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--control);
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+.trellis-row.is-done .trellis-step::before {
+  border-color: var(--done);
+  background: var(--done);
+}
+
+.trellis-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trellis-topics > li {
+  display: flex;
+}
+
+.topic {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 4px;
+  min-width: 168px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--raised);
+  color: var(--text);
+  text-align: left;
+  transition:
+    border-color var(--fast) var(--ease),
+    background-color var(--fast) var(--ease),
+    transform var(--fast) var(--ease);
+}
+
+.topic:hover {
+  border-color: var(--muted);
+}
+
+.topic:active {
+  transform: scale(0.98);
+}
+
+.topic-name {
+  font-weight: 600;
+}
+
+.topic-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: var(--fs-small);
+}
+
+.topic-status .dot {
+  width: 8px;
+  height: 8px;
+}
+
+.topic-next {
+  color: var(--accent);
+  font-size: var(--fs-small);
+  font-weight: 600;
+}
+
+/* Status fills: pale, so the names stay the loudest thing */
+.topic.status-DONE {
+  background: var(--done-bg);
+  border-color: transparent;
+}
+
+.topic.status-LEARNING {
+  background: var(--learning-bg);
+  border-color: transparent;
+}
+
+.topic.status-STUCK {
+  background: var(--stuck-bg);
+  border-color: transparent;
+}
+
+.topic.status-DONE .topic-status {
+  color: var(--done);
+}
+
+.topic.status-LEARNING .topic-status {
+  color: var(--learning);
+}
+
+.topic.status-STUCK .topic-status {
+  color: var(--stuck);
+}
+
+/* Next up: a teal ring. Open: an ink ring. Needed first: a dashed ring. */
+.topic.is-next {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.topic.is-needed {
+  outline: 2px dashed var(--muted);
+  outline-offset: 2px;
+}
+
+.topic.is-selected {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.topic:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+
+/* ---- The topic panel ---- */
+
+.topic-panel {
+  display: grid;
+  gap: 20px;
+  animation: panel-in var(--slow) var(--ease);
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.topic-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: -8px;
+}
+
+.topic-panel-head h2 {
+  padding-top: 4px;
+  font-size: var(--fs-topic);
+  letter-spacing: -0.01em;
+}
+
+.topic-panel-head .icon-btn {
+  flex: none;
+  margin: -2px -8px 0 0;
+}
+
+.topic-summary {
+  font-size: var(--fs-read);
+}
+
+.topic-needs {
+  margin-top: -12px;
+}
+
+.topic-needs-list {
+  color: var(--text);
+}
+
+.panel-block {
+  display: grid;
+  gap: 10px;
+}
+
+.mistakes {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+  font-size: var(--fs-read);
+}
+
+.mistakes li::marker {
+  color: var(--muted);
+}
+
+/* "Where you are": four options in one track */
+.segmented {
+  display: inline-grid;
+  justify-self: start; /* as wide as its options; full width only on a phone */
+  grid-template-columns: repeat(4, auto);
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--radius-chip);
+  background: var(--active);
+}
+
+.segment {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--radius-chip);
+  background: none;
+  color: var(--muted);
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+
+.segment .dot {
+  width: 8px;
+  height: 8px;
+}
+
+.segment:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.segment[aria-pressed="true"] {
+  background: var(--raised);
+  color: var(--text);
+}
+
+.segment:disabled {
+  cursor: progress;
+}
+
+.note-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hint p {
+  font-size: var(--fs-read);
+}
+
+/* The prompt: the one white card inside the panel */
+.prompt-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--raised);
+}
+
+.prompt-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.prompt {
+  max-height: 320px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.prompt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---- Login and sign up ---- */
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 24px 0 32px;
+}
+
+.auth {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  align-items: center;
+  gap: 64px;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px 32px 80px;
+}
+
+.auth-intro {
+  display: grid;
+  gap: 20px;
+  max-width: 520px;
+}
+
+.auth-lede {
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.auth-points {
+  display: grid;
+  gap: 12px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-read);
+}
+
+.auth-points li {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.auth-panel {
+  display: grid;
+  gap: 16px;
+  padding: 32px;
+  background: var(--ground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+}
+
+.auth-panel h2 {
+  font-size: var(--fs-topic);
+}
+
+.auth-form {
+  display: grid;
+  gap: 16px;
+}
+
+.auth-form .btn {
+  margin-top: 4px;
+}
+
+.error-notice {
+  color: var(--text);
+}
+
+.auth-or {
+  color: var(--muted);
+  font-size: var(--fs-small);
+  text-align: center;
+}
+
+.auth-switch {
+  text-align: center;
+}
+
+/* ---- Admin: settings rows, a label column beside a panel ---- */
+
+.settings-row {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 48px;
+  padding: 32px 0;
+  border-top: 1px solid var(--border);
+}
+
+.settings-label {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding-top: 6px;
+}
+
+.settings-panel {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  margin: 0;
+  padding: 20px;
+  border: 0;
+  border-radius: var(--radius-sheet);
+  background: var(--surface);
+}
+
+.needs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 4px 16px;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  cursor: pointer;
+}
+
+.save-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+/* ---- Tablet and phone ---- */
+
+@media (max-width: 63.99rem) {
+  .auth {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+    max-width: 560px;
+  }
+
+  .settings-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 45rem) {
+  .header-user {
+    display: none;
+  }
+
+  .counts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 40rem) {
+  /* The frame goes: the sheet becomes the whole screen. */
+  .header,
+  .auth-top {
+    height: 52px;
+    gap: 8px;
+    padding: 0 8px 0 16px;
+  }
+
+  .header-nav {
+    gap: 0;
+  }
+
+  .header-end {
+    gap: 0;
+  }
+
+  .sheet {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .page {
+    padding: 24px 16px 48px;
+  }
+
+  .greeting {
+    font-size: 32px;
+  }
+
+  .title-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .panel {
+    padding: 16px;
+  }
+
+  .count {
+    min-height: 0;
+  }
+
+  .trellis-row {
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+
+  .trellis-topics > li,
+  .topic {
+    width: 100%;
+  }
+
+  .segmented {
+    justify-self: stretch;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-radius: 18px;
+  }
+
+  .auth {
+    padding: 16px 16px 48px;
+    gap: 24px;
+  }
+
+  /* On a phone the form matters most: keep the heading and one line above it. */
+  .auth-points {
+    display: none;
+  }
+
+  .auth-panel {
+    padding: 20px;
+  }
+
+  .save-row {
+    flex-wrap: wrap;
+  }
+}

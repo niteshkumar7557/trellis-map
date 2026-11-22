@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link, Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, NavLink, Route, Routes } from "react-router-dom";
 import { logout, restoreSession } from "./api.js";
 import AuthForm from "./AuthForm.jsx";
 import MapPage from "./MapPage.jsx";
 import AdminPage from "./AdminPage.jsx";
+import { Brand, ThemeToggle } from "./ui.jsx";
 
 export default function App() {
   // undefined = still asking the server, null = signed out, object = signed in.
@@ -13,7 +14,7 @@ export default function App() {
     restoreSession().then(setUser);
   }, []);
 
-  if (user === undefined) return <p className="center">Loading…</p>;
+  if (user === undefined) return <p className="center muted">Loading…</p>;
 
   async function handleLogout() {
     await logout().catch(() => {});
@@ -33,7 +34,7 @@ export default function App() {
         path="/signup"
         element={user ? <Navigate to="/" /> : <AuthForm mode="signup" onSignedIn={setUser} />}
       />
-      <Route path="/" element={signedIn(<MapPage />)} />
+      <Route path="/" element={signedIn(<MapPage user={user} />)} />
       <Route
         path="/admin"
         element={signedIn(user?.role === "ADMIN" ? <AdminPage /> : <Navigate to="/" />)}
@@ -43,23 +44,32 @@ export default function App() {
   );
 }
 
-// The header every signed-in screen shares.
+// The frame every signed-in screen shares: a header on the tinted frame, and the
+// screen itself on a white sheet.
 function SignedIn({ user, onLogout, children }) {
   return (
-    <>
+    <div className="shell">
       <header className="header">
-        <Link to="/" className="brand">
-          Trellis
-        </Link>
-        <nav>
-          <span>{user.name}</span>
-          {user.role === "ADMIN" && <Link to="/admin">Edit topics</Link>}
-          <button className="link" onClick={onLogout}>
+        <Brand />
+        <nav className="header-nav" aria-label="Main">
+          <NavLink to="/" end className="nav-link">
+            Map
+          </NavLink>
+          {user.role === "ADMIN" && (
+            <NavLink to="/admin" className="nav-link">
+              Edit topics
+            </NavLink>
+          )}
+        </nav>
+        <div className="header-end">
+          <ThemeToggle />
+          <span className="header-user">{user.name}</span>
+          <button className="btn-ghost" onClick={onLogout}>
             Log out
           </button>
-        </nav>
+        </div>
       </header>
-      {children}
-    </>
+      <div className="sheet">{children}</div>
+    </div>
   );
 }
