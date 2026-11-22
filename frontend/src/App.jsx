@@ -26,6 +26,16 @@ export default function App() {
       .then(({ subjects: list }) => {
         if (!list.length) return;
         setSubjects(list);
+        const params = new URLSearchParams(window.location.search);
+        const slugParam = params.get("subject");
+        if (slugParam) {
+          const matched = list.find((s) => s.slug === slugParam.toLowerCase());
+          if (matched) {
+            setSelectedSubjectId(matched.id);
+            localStorage.setItem("trellis-subject-id", String(matched.id));
+            return;
+          }
+        }
         // Use saved subject if valid, else default to first
         setSelectedSubjectId((prev) => {
           const valid = list.some((s) => s.id === prev);
@@ -99,6 +109,7 @@ function SignedIn({ user, onLogout, subjects, selectedSubjectId, onSelectSubject
                 <button
                   key={s.id}
                   role="tab"
+                  data-subject={s.slug}
                   aria-selected={s.id === selectedSubjectId}
                   className={s.id === selectedSubjectId ? "nav-link active" : "nav-link"}
                   onClick={() => onSelectSubject(s.id)}
