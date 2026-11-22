@@ -97,6 +97,49 @@
   padding: 40px var(--page-pad) 64px;
 }
 
+/* ---- Subject switcher ---- */
+
+.subject-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-chip);
+  margin-bottom: 24px;
+}
+
+.subject-tab {
+  height: 32px;
+  padding: 0 16px;
+  border-radius: var(--radius-chip);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  font-weight: 500;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+
+.subject-tab:hover {
+  color: var(--text);
+  background: var(--active);
+}
+
+.subject-tab.is-active {
+  color: var(--on-primary);
+  background: var(--primary);
+  cursor: default;
+}
+
+.subject-tab:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
 /* ---- The title row every screen opens with ---- */
 
 .title-row {
