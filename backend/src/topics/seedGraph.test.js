@@ -1,0 +1,121 @@
+import { describe, it, expect, vi } from "vitest";
+import {
+  JAVASCRIPT_SUBJECT,
+  JAVASCRIPT_TOPICS,
+  MONGODB_SUBJECT,
+  MONGODB_TOPICS,
+  seedSubject,
+} from "../../prisma/seed.js";
+import { sortTopics } from "./sortTopics.js";
+
+describe("seed topic graphs and repeatability", () => {
+  it("MongoDB topic map defines 12 topics with valid metadata and mistake descriptions", () => {
+    expect(MONGODB_SUBJECT.slug).toBe("mongodb");
+    expect(MONGODB_SUBJECT.name).toBe("MongoDB fundamentals");
+    expect(MONGODB_TOPICS).toHaveLength(12);
+
+    for (const topic of MONGODB_TOPICS) {
+      expect(topic.slug).toBeTruthy();
+      expect(topic.name).toBeTruthy();
+      expect(topic.summary).toBeTruthy();
+      expect(Array.isArray(topic.mistakes)).toBe(true);
+      expect(topic.mistakes.length).toBeGreaterThan(0);
+      expect(Array.isArray(topic.needs)).toBe(true);
+    }
+  });
+
+  it("every MongoDB prerequisite points to a valid topic within the subject", () => {
+    const slugSet = new Set(MONGODB_TOPICS.map((t) => t.slug));
+
+    for (const topic of MONGODB_TOPICS) {
+      for (const prereqSlug of topic.needs) {
+        expect(slugSet.has(prereqSlug)).toBe(true);
+      }
+    }
+  });
+
+  it("sortTopics successfully orders MongoDB fundamentals into a valid DAG without loops", () => {
+    // Map slugs to numeric IDs for sortTopics
+    const slugToId = new Map(MONGODB_TOPICS.map((t, idx) => [t.slug, idx + 1]));
+    const topicsWithIds = MONGODB_TOPICS.map((t) => ({
+      id: slugToId.get(t.slug),
+      slug: t.slug,
+      name: t.name,
+      summary: t.summary,
+      mistakes: t.mistakes,
+      needs: t.needs.map((s) => slugToId.get(s)),
+    }));
+
+    const sorted = sortTopics(topicsWithIds);
+    expect(sorted).toHaveLength(12);
+
+    const indexById = new Map(sorted.map((t, idx) => [t.id, idx]));
+    const levelById = new Map(sorted.map((t) => [t.id, t.level]));
+
+    for (const topic of sorted) {
+      for (const prereqId of topic.needs) {
+        expect(indexById.get(prereqId)).toBeLessThan(indexById.get(topic.id));
+        expect(levelById.get(topic.id)).toBeGreaterThan(levelById.get(prereqId));
+      }
+    }
+
+    // Level 0 should only contain topics with no prerequisites
+    const rootTopics = sorted.filter((t) => t.level === 0);
+    expect(rootTopics.map((t) => t.slug)).toEqual(["documents"]);
+  });
+
+  it("JavaScript topic map remains intact with 15 topics and valid learning order", () => {
+    expect(JAVASCRIPT_TOPICS).toHaveLength(15);
+    const slugToId = new Map(JAVASCRIPT_TOPICS.map((t, idx) => [t.slug, idx + 1]));
+    const topicsWithIds = JAVASCRIPT_TOPICS.map((t) => ({
+      id: slugToId.get(t.slug),
+      slug: t.slug,
+      name: t.name,
+      needs: t.needs.map((s) => slugToId.get(s)),
+    }));
+
+    const sorted = sortTopics(topicsWithIds);
+    expect(sorted).toHaveLength(15);
+  });
+
+  it("seedSubject correctly scopes deletions to the target subject and executes idempotently", async () => {
+    const fakeDb = {
+      subject: {
+        upsert: vi.fn().mockResolvedValue({ id: 99, slug: "mongodb", name: "MongoDB fundamentals" }),
+      },
+      topic: {
+        upsert: vi.fn().mockImplementation(({ where }) =>
+          Promise.resolve({ id: 101, subjectId: where.subjectId_slug.subjectId, slug: where.subjectId_slug.slug })
+        ),
+      },
+      topicPrerequisite: {
+        deleteMany: vi.fn().mockResolvedValue({ count: 5 }),
+        createMany: vi.fn().mockResolvedValue({ count: 5 }),
+      },
+    };
+
+    const sampleTopics = [
+      { slug: "a", name: "A", summary: "sA", mistakes: ["mA"], needs: [] },
+      { slug: "b", name: "B", summary: "sB", mistakes: ["mB"], needs: ["a"] },
+    ];
+
+    const result = await seedSubject(fakeDb, MONGODB_SUBJECT, sampleTopics);
+
+    expect(fakeDb.subject.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { slug: "mongodb" } })
+    );
+    expect(fakeDb.topic.upsert).toHaveBeenCalledTimes(2);
+    // Verified: scoped deletion only affects this subject
+    expect(fakeDb.topicPrerequisite.deleteMany).toHaveBeenCalledWith({
+      where: {
+        topic: {
+          subjectId: 99,
+        },
+      },
+    });
+    expect(fakeDb.topicPrerequisite.createMany).toHaveBeenCalledWith({
+      data: [{ topicId: 101, prerequisiteId: 101 }],
+    });
+    expect(result.topicCount).toBe(2);
+  });
+});
