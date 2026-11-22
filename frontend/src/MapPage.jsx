@@ -69,6 +69,10 @@ export default function MapPage({ user }) {
       try {
         setError("");
         setSelectedId(null); // Close any topic panel from a previous subject
+        setStatusById({});   // Reset progress statuses so previous subject data is not shown
+        setNoteById({});
+        setNext(undefined);  // Reset next topic while loading
+
         const data = await apiFetch(`/api/subjects/${selectedSubjectId}/topics`);
         if (cancelled) return;
 
