@@ -37,22 +37,23 @@ AI feature only rewrites the prompt; it never explains the topic.
 1. Sign up and log in with email and password, or with Google.
 2. A short-lived access token plus a refresh token in a cookie; logout really ends the
    session.
-3. One subject, **JavaScript fundamentals**, with 15 topics and "needs" links between them,
-   loaded by a seed script.
-4. Topics shown in learning order (grouped by level).
-5. A status on each topic: Not started, Learning, Done, Stuck. Plus a short note.
-6. The next topic.
-7. The stuck hint.
-8. The prompt, built from a template, with a Copy button.
-9. "Improve with AI": one Groq call that rewrites the prompt; falls back to the template if
-   the AI fails.
-10. An admin role: admins can add and edit topics. Students can't.
-11. Rate limiting on login and on the AI route.
-12. Unit tests (Vitest) for every part.
+3. Two subjects, **JavaScript fundamentals** (15 topics) and **MongoDB fundamentals** (12
+   topics), with "needs" links between them, loaded by a seed script.
+4. Subject switcher allowing students and admins to choose between subjects.
+5. Topics shown in learning order (grouped by level).
+6. A status on each topic: Not started, Learning, Done, Stuck. Plus a short note.
+7. The next topic.
+8. The stuck hint.
+9. The prompt, built from a template, with a Copy button.
+10. "Improve with AI": one Groq call that rewrites the prompt; falls back to the template if
+    the AI fails.
+11. An admin role: admins can add and edit topics. Students can't.
+12. Rate limiting on login and on the AI route.
+13. Unit tests (Vitest) for every part.
 
-**Out (on purpose):** a chat, quizzes, explanations, more subjects, topics inside topics,
-password reset, email, deleting your account, deployment. The app runs on our laptops for
-the demo.
+**Out (on purpose):** a chat, quizzes, explanations, third-party subjects beyond JS and
+MongoDB, topics inside topics, password reset, email, deleting your account, deployment. The
+app runs on our laptops for the demo.
 
 ## 3. Tech stack and why
 
@@ -398,10 +399,12 @@ A line with nothing to say (no note, no prerequisites) is left out.
 Groq's free tier is one key shared by everyone, so the AI limit stops one student using it
 all up.
 
-## 9. The subject: JavaScript fundamentals
+## 9. The subjects
 
 Seeded by `prisma/seed.js` (Part 1), which also holds each topic's summary and common
 mistakes.
+
+### 9.1 JavaScript fundamentals
 
 | # | slug | Topic | Needs |
 |---|---|---|---|
@@ -420,6 +423,23 @@ mistakes.
 | 13 | `errors` | Error handling | functions |
 | 14 | `promises` | Promises | callbacks, errors |
 | 15 | `async-await` | async and await | promises |
+
+### 9.2 MongoDB fundamentals
+
+| # | slug | Topic | Needs | Summary | Common mistakes |
+|---|---|---|---|---|---|
+| 1 | `documents` | Documents and BSON | none | Documents, collections, JSON vs BSON, and field types (ObjectId, string, number, date) | Thinking MongoDB is schemaless with no structure needed; using strings for IDs instead of ObjectId |
+| 2 | `crud-insert` | Inserting documents | documents | insertOne, insertMany, auto-generated _id, and write concern basics | Re-inserting the same _id and hitting duplicate key errors; expecting insertMany to roll back on partial failure without transactions |
+| 3 | `crud-find` | Querying documents | documents | find, findOne, query filters, equality, and projections | Omitting projection for unwanted fields; confusing query filter syntax with projection syntax |
+| 4 | `comparison-operators` | Comparison and logical operators | crud-find | $eq, $ne, $gt, $gte, $lt, $lte, $in, $and, $or, $nor | Forgetting that $in takes an array; wrapping multiple fields in $and when implicit AND works |
+| 5 | `nested-documents` | Embedded documents and dot notation | crud-find | Querying and updating nested fields with dot notation and nested object equality | Matching an entire subdocument when matching a single nested field was intended; forgetting quotes in dot notation ("address.city") |
+| 6 | `arrays-query` | Querying arrays | nested-documents | Array field queries, $all, $size, $elemMatch, and element querying | Expecting multiple conditions on array elements to match the same element without $elemMatch; checking array length with comparison operators instead of $size |
+| 7 | `crud-update` | Updating documents | crud-find | updateOne, updateMany, replaceOne, and field update operators ($set, $unset, $inc) | Forgetting $set and accidentally replacing the entire document; assuming updateOne updates all matching rows |
+| 8 | `array-updates` | Updating arrays | crud-update, arrays-query | Array update operators: $push, $pull, $addToSet, and the positional operator ($) | Using $push when avoiding duplicates requires $addToSet; mutating the wrong array element with improper positional operators |
+| 9 | `crud-delete` | Deleting documents | crud-find | deleteOne, deleteMany, and drop collection | Calling deleteMany with an empty filter and wiping all documents; confusing drop collection with deleting documents |
+| 10 | `indexes` | Indexes and performance | crud-find | Single field indexes, compound indexes, explain(), and COLLSCAN vs IXSCAN | Creating too many indexes and slowing down writes; indexing fields in compound indexes in an order that violates equality-sort-range rules |
+| 11 | `aggregation-pipeline` | Aggregation pipeline basics | comparison-operators | Pipeline concept, $match, $project, $limit, $skip, and $sort | Putting $project before $match and preventing index usage; confusing find() filters with aggregation stage syntax |
+| 12 | `aggregation-group` | Grouping and transforming | aggregation-pipeline, array-updates | $group, accumulator expressions ($sum, $avg, $push), and $unwind | Forgetting that _id is required in $group; expecting $unwind to keep empty arrays without preserveNullAndEmptyArrays |
 
 ## 10. Environment variables (`backend/.env`)
 

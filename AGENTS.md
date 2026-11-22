@@ -8,7 +8,8 @@ Antigravity for Riya, Nihamika and Mansha.
 **Trellis** is a study planner built around a map of topics, for a backend course's
 end-of-semester viva.
 
-- It shows the topics of **JavaScript fundamentals** in learning order and the next topic.
+- It shows the topics of **JavaScript fundamentals** and **MongoDB fundamentals** in
+  learning order and the next topic.
 - When a topic is marked Stuck, it says which earlier topic "may be" the cause.
 - It builds a prompt for the student's own AI, with an optional "Improve with AI" through
   Groq.
