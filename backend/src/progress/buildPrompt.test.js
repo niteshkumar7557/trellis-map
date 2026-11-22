@@ -50,5 +50,37 @@ describe("buildPrompt", () => {
 
     expect(prompt).toContain("I think I know this. Quiz me first and only teach what I get wrong.");
   });
+
+  it("builds a complete prompt for a MongoDB fundamentals topic with prerequisites and mistakes", () => {
+    const mongoTopic = {
+      id: 108,
+      name: "Aggregation pipeline basics",
+      summary: "Pipeline concept, $match, $project, $limit, $skip, and $sort",
+      mistakes: [
+        "Putting $project before $match and preventing index usage",
+        "confusing find() filters with aggregation stage syntax",
+      ],
+    };
+
+    const prereqs = [
+      { id: 104, name: "Comparison and logical operators" },
+    ];
+
+    const prompt = buildPrompt({
+      subjectName: "MongoDB fundamentals",
+      topic: mongoTopic,
+      prereqs,
+      statusById: { 108: "STUCK", 104: "NOT_STARTED" },
+      note: "Stages order is tricky",
+      hint: { topicId: 104, name: "Comparison and logical operators" },
+    });
+
+    expect(prompt).toContain("I'm learning MongoDB fundamentals. The topic is Aggregation pipeline basics: Pipeline concept, $match, $project, $limit, $skip, and $sort.");
+    expect(prompt).toContain("I'm not solid on yet: Comparison and logical operators.");
+    expect(prompt).toContain("My note: Stages order is tricky.");
+    expect(prompt).toContain("Common mistakes to watch for: Putting $project before $match and preventing index usage, confusing find() filters with aggregation stage syntax.");
+    expect(prompt).toContain("I'm stuck on this. Start with what I may be missing: Comparison and logical operators.");
+    expect(prompt).toContain("Teach me in small steps and ask me one question after each step. Don't lecture.");
+  });
 });
 
