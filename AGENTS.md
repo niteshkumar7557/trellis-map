@@ -70,6 +70,9 @@ parts, their tests (`npm test`: 12 files, 45 passed) and the frontend. `docs/des
 says who built what. The step-by-step checklist and the per-person docs have been removed;
 they are in the git history if needed.
 
+**Frontend redesign (22 Nov 2026), branch `frontend-design-system`:** a design system with
+light and dark mode (`docs/design.md` §15). Frontend only; no backend changes.
+
 **Next:** the viva deadline has been extended, so the team will add new features. Add each
 feature to `docs/design.md` (what it does, its routes and fields, who owns it) before
 building it, on that owner's branch.

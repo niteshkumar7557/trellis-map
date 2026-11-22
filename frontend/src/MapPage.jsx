@@ -3,8 +3,18 @@ import { apiFetch } from "./api.js";
 import TopicPanel from "./TopicPanel.jsx";
 import { STATUS_LABELS } from "./statuses.js";
 
+// The counts read in the order a student moves through a topic.
+const COUNT_ORDER = ["DONE", "LEARNING", "STUCK", "NOT_STARTED"];
+
+// "None", "Objects", "Objects, Loops" or "Objects, Loops and 3 more".
+function nameList(list) {
+  if (list.length === 0) return "None";
+  const names = list.slice(0, 2).map((t) => t.name).join(", ");
+  return list.length > 2 ? `${names} and ${list.length - 2} more` : names;
+}
+
 // The map: the subject's topics in learning order, one row per level.
-export default function MapPage() {
+export default function MapPage({ user }) {
   const [subject, setSubject] = useState(null);
   const [topics, setTopics] = useState([]);
   const [statusById, setStatusById] = useState({});
@@ -42,12 +52,23 @@ export default function MapPage() {
     load();
   }, [loadProgress]);
 
-  if (error) return <p className="center error" role="alert">{error}</p>;
-  if (!subject) return <p className="center">Loading the map…</p>;
+  if (error) {
+    return (
+      <main className="page">
+        <p className="notice" role="alert">
+          Couldn't load the map. {error}
+        </p>
+      </main>
+    );
+  }
+  if (!subject) return <p className="center muted">Loading the map…</p>;
 
   const topicsById = Object.fromEntries(topics.map((t) => [t.id, t]));
   const selected = topicsById[selectedId];
-  const doneCount = topics.filter((t) => statusById[t.id] === "DONE").length;
+  const statusOf = (topic) => statusById[topic.id] ?? "NOT_STARTED";
+  const topicsWith = (status) => topics.filter((t) => statusOf(t) === status);
+  const doneCount = topicsWith("DONE").length;
+  const firstName = user.name.split(" ")[0];
 
   // Group the topics into rows by level. They arrive in learning order already.
   const levels = [];
@@ -56,55 +77,88 @@ export default function MapPage() {
   }
 
   return (
-    <div className={selected ? "map-layout has-panel" : "map-layout"}>
-      <section className="map" aria-labelledby="map-title">
-        <h1 id="map-title">{subject.name}</h1>
-        <p className="map-summary">
-          {doneCount} of {topics.length} done.{" "}
-          {next === null && "Every topic is done."}
-          {next && (
-            <>
-              Next up:{" "}
-              <button className="link-inline" onClick={() => setSelectedId(next.id)}>
-                {next.name}
-              </button>
-            </>
-          )}
-        </p>
+    <main className={selected ? "page map-layout has-panel" : "page map-layout"}>
+      <div className="title-row">
+        <div>
+          <h1 className="greeting">
+            {next ? `${firstName}, ${next.name} is next.` : `${firstName}, every topic is done.`}
+          </h1>
+          <p className="title-sub muted">
+            {subject.name} · <span className="num">{doneCount}</span> of{" "}
+            <span className="num">{topics.length}</span> done
+          </p>
+        </div>
+        {next && next.id !== selectedId && (
+          <button className="btn" onClick={() => setSelectedId(next.id)}>
+            Open {next.name}
+          </button>
+        )}
+      </div>
 
-        <ul className="legend" aria-label="What the colours mean">
-          {Object.entries(STATUS_LABELS).map(([status, label]) => (
-            <li key={status}>
-              <span className={`swatch status-${status}`} aria-hidden="true" />
-              {label}
+      {/* One cell per topic, in learning order: the whole subject at a glance. */}
+      <ol className="progress-strip" aria-label={`${doneCount} of ${topics.length} topics done`}>
+        {topics.map((topic) => (
+          <li key={topic.id} className={`strip-cell status-${statusOf(topic)}`} title={topic.name} />
+        ))}
+      </ol>
+
+      {/* The four counts are also the legend for the colours on the map. */}
+      <ul className="counts" aria-label="Topics by status">
+        {COUNT_ORDER.map((status) => {
+          const list = topicsWith(status);
+          return (
+            <li key={status} className="count">
+              <span className="count-label">
+                <span className={`dot status-${status}`} aria-hidden="true" />
+                {STATUS_LABELS[status]}
+              </span>
+              <span className="count-value num">{list.length}</span>
+              <span className="count-caption muted">
+                {status === "DONE" ? `of ${topics.length} topics` : nameList(list)}
+              </span>
             </li>
-          ))}
-        </ul>
+          );
+        })}
+      </ul>
+
+      <section className="panel map" aria-labelledby="map-title">
+        <div className="panel-head">
+          <h2 id="map-title">Learning order</h2>
+          {selected && selected.needs.length > 0 && (
+            <p className="muted map-hint">
+              <span className="needed-swatch" aria-hidden="true" /> What {selected.name} needs
+              first
+            </p>
+          )}
+        </div>
 
         <ol className="trellis">
-          {levels.map((row, level) => (
-            <li key={level} className="trellis-row">
-              <span className="trellis-step">Step {level + 1}</span>
-              <ul className="trellis-topics">
-                {row.map((topic) => (
-                  <li key={topic.id}>
-                    <TopicNode
-                      topic={topic}
-                      status={statusById[topic.id] ?? "NOT_STARTED"}
-                      isNext={next?.id === topic.id}
-                      isSelected={topic.id === selectedId}
-                      isNeeded={selected?.needs.includes(topic.id) ?? false}
-                      onSelect={() => setSelectedId(topic.id)}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
+          {levels.map((row, level) => {
+            const rowDone = row.every((t) => statusOf(t) === "DONE");
+            return (
+              <li key={level} className={rowDone ? "trellis-row is-done" : "trellis-row"}>
+                <span className="trellis-step">
+                  Step <span className="num">{level + 1}</span>
+                  {rowDone && <span className="visually-hidden"> (all done)</span>}
+                </span>
+                <ul className="trellis-topics">
+                  {row.map((topic) => (
+                    <li key={topic.id}>
+                      <TopicNode
+                        topic={topic}
+                        status={statusOf(topic)}
+                        isNext={next?.id === topic.id}
+                        isSelected={topic.id === selectedId}
+                        isNeeded={selected?.needs.includes(topic.id) ?? false}
+                        onSelect={() => setSelectedId(topic.id)}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            );
+          })}
         </ol>
-        {selected && selected.needs.length > 0 && (
-          <p className="muted map-hint">Outlined: what {selected.name} needs first.</p>
-        )}
       </section>
 
       {selected && (
@@ -113,13 +167,13 @@ export default function MapPage() {
           key={selected.id}
           topic={selected}
           topicsById={topicsById}
-          status={statusById[selected.id] ?? "NOT_STARTED"}
+          status={statusOf(selected)}
           note={noteById[selected.id] ?? ""}
           onSaved={() => loadProgress(subject.id)}
           onClose={() => setSelectedId(null)}
         />
       )}
-    </div>
+    </main>
   );
 }
 
@@ -133,7 +187,10 @@ function TopicNode({ topic, status, isNext, isSelected, isNeeded, onSelect }) {
     <button className={classes.join(" ")} onClick={onSelect} aria-pressed={isSelected}>
       {isNext && <span className="topic-next">Next up</span>}
       <span className="topic-name">{topic.name}</span>
-      <span className="topic-status">{STATUS_LABELS[status]}</span>
+      <span className="topic-status">
+        <span className={`dot status-${status}`} aria-hidden="true" />
+        {STATUS_LABELS[status]}
+      </span>
     </button>
   );
 }

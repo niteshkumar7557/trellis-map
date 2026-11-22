@@ -79,76 +79,133 @@ export default function AdminPage() {
   }
 
   if (!subject) {
-    return error ? <p className="center error" role="alert">{error}</p> : <p className="center">Loading…</p>;
+    return error ? (
+      <main className="page">
+        <p className="notice" role="alert">
+          Couldn't load the topics. {error}
+        </p>
+      </main>
+    ) : (
+      <p className="center muted">Loading…</p>
+    );
   }
 
   return (
-    <main className="admin">
-      <h1>Topics in {subject.name}</h1>
-
-      <label>
-        Topic
-        <select value={editingId} onChange={(e) => pickTopic(e.target.value)}>
-          <option value="">New topic</option>
-          {topics.map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.name}
-            </option>
-          ))}
-        </select>
-      </label>
+    <main className="page admin">
+      <div className="title-row">
+        <div>
+          <h1>Edit topics</h1>
+          <p className="title-sub muted">
+            {subject.name} · <span className="num">{topics.length}</span> topics
+          </p>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit}>
-        <label>
-          Name
-          <input
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            required
-          />
-        </label>
-        <label>
-          Summary
-          <input
-            value={form.summary}
-            onChange={(e) => setForm({ ...form, summary: e.target.value })}
-            placeholder="One line: what the topic covers"
-            required
-          />
-        </label>
-        <label>
-          Common mistakes, one per line
-          <textarea
-            rows={4}
-            value={form.mistakes}
-            onChange={(e) => setForm({ ...form, mistakes: e.target.value })}
-          />
-        </label>
-
-        <fieldset>
-          <legend>Needs these topics first</legend>
-          <div className="needs-grid">
-            {topics
-              .filter((t) => t.id !== Number(editingId))
-              .map((t) => (
-                <label key={t.id} className="check">
-                  <input
-                    type="checkbox"
-                    checked={form.needs.includes(t.id)}
-                    onChange={() => toggleNeed(t.id)}
-                  />
-                  {t.name}
-                </label>
-              ))}
+        <section className="settings-row" aria-labelledby="pick-title">
+          <div className="settings-label">
+            <h2 id="pick-title">Which topic</h2>
+            <p className="muted">Pick one to change it, or start a new one.</p>
           </div>
-        </fieldset>
+          <div className="settings-panel">
+            <label className="field">
+              Topic
+              <select value={editingId} onChange={(e) => pickTopic(e.target.value)}>
+                <option value="">New topic</option>
+                {topics.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        </section>
 
-        {message && <p className="success" role="status">{message}</p>}
-        {error && <p className="error" role="alert">{error}</p>}
+        <section className="settings-row" aria-labelledby="details-title">
+          <div className="settings-label">
+            <h2 id="details-title">Details</h2>
+            <p className="muted">
+              Students see the name and summary on the map, and the mistakes in the topic
+              panel and the prompt.
+            </p>
+          </div>
+          <div className="settings-panel">
+            <label className="field">
+              Name
+              <input
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                required
+              />
+            </label>
+            <label className="field">
+              Summary
+              <input
+                value={form.summary}
+                onChange={(e) => setForm({ ...form, summary: e.target.value })}
+                placeholder="One line: what the topic covers"
+                required
+              />
+            </label>
+            <label className="field">
+              Common mistakes
+              <textarea
+                rows={4}
+                value={form.mistakes}
+                onChange={(e) => setForm({ ...form, mistakes: e.target.value })}
+                aria-describedby="mistakes-hint"
+              />
+              <span className="field-hint" id="mistakes-hint">
+                One mistake per line.
+              </span>
+            </label>
+          </div>
+        </section>
 
-        <button type="submit" disabled={busy}>
-          {editingId ? "Save changes" : "Add topic"}
-        </button>
+        <section className="settings-row" aria-labelledby="needs-title">
+          <div className="settings-label">
+            <h2 id="needs-title">Needs these topics first</h2>
+            <p className="muted">
+              They decide the topic's step on the map. A loop, where two topics need each
+              other, is refused.
+            </p>
+            <p className="muted num">{form.needs.length} chosen</p>
+          </div>
+          <fieldset className="settings-panel">
+            <legend className="visually-hidden">Needs these topics first</legend>
+            <div className="needs-grid">
+              {topics
+                .filter((t) => t.id !== Number(editingId))
+                .map((t) => (
+                  <label key={t.id} className="check">
+                    <input
+                      type="checkbox"
+                      checked={form.needs.includes(t.id)}
+                      onChange={() => toggleNeed(t.id)}
+                    />
+                    {t.name}
+                  </label>
+                ))}
+            </div>
+          </fieldset>
+        </section>
+
+        <div className="save-row">
+          {message && (
+            <p className="success" role="status">
+              {message}
+            </p>
+          )}
+          {error && (
+            <p className="error" role="alert">
+              {error}
+            </p>
+          )}
+          <button type="submit" className="btn" disabled={busy}>
+            {busy ? "Saving…" : editingId ? "Save changes" : "Add topic"}
+          </button>
+        </div>
       </form>
     </main>
   );

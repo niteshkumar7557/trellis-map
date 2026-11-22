@@ -549,3 +549,35 @@ We know these and can say so if asked:
 - **No logging or monitoring, no password reset, no email verification.**
 - **Unit tests only.** There are no integration tests against a real database, and no CI
   running the tests on every push.
+
+## 15. Frontend design system
+
+The frontend has no backend logic of its own; this is how it looks, so every screen stays
+consistent. Built with Claude Code (Nitesh); not part of the viva.
+
+- **Files.** `frontend/src/index.css` imports three layers:
+  - `styles/tokens.css`: every colour, size, radius and timing as a CSS variable, once for
+    light and once for dark (`:root[data-theme="dark"]`). Nothing else uses a raw colour.
+  - `styles/base.css`: plain elements and the shared controls: `.btn` (the one filled,
+    near-black button per screen), `.btn-secondary`, `.btn-ghost`, `.icon-btn`, `.field`,
+    `.dot` (the status mark), `.notice`.
+  - `styles/app.css`: the frame and the four screens.
+- **Light and dark.** A small script in `index.html` sets `data-theme` on `<html>` before
+  the page paints: the saved choice (`localStorage` key `trellis-theme`), otherwise the
+  system setting. The moon/sun button in the header (`ThemeToggle` in `src/ui.jsx`, using
+  `src/theme.js`) switches it and saves the choice.
+- **Type.** Instrument Sans for everything; Instrument Serif only for the greeting.
+  Sizes 12 / 14 / 15 / 16 / 22 / 32 / 44px. Numbers use tabular figures (`.num`).
+- **Colour.** Neutral chrome; colour only means something. Deep teal is Done and the next
+  topic, amber is Learning, red is Stuck, grey is Not started. Each status has one mark
+  (`.dot`) used on the map, in the counts and in the panel, so the counts are the legend.
+- **The frame.** The header sits on a tinted frame; each screen sits on a white sheet.
+  Panels are one tone step off the sheet, with no shadows.
+- **The map screen.** A greeting that names the next topic ("Asha, Objects is next.") with
+  an "Open" button; a strip of 15 cells in learning order; four counts by status; the
+  trellis, where a step's knot fills once all its topics are done. The topic panel opens
+  beside the map (below it on narrow screens).
+- **Phones.** Below 640px the frame goes and the sheet is the whole screen; counts go 2 x 2
+  and topics stack.
+- **Motion.** Feedback only (hover, press, the panel opening), and none when the system
+  asks for reduced motion.

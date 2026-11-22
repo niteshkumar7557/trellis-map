@@ -1,0 +1,105 @@
+/*
+  Trellis design tokens.
+
+  Every colour, size and radius in the app comes from here, so light and dark mode are
+  just two sets of the same names. Components never use a raw colour.
+
+  The theme is set on <html data-theme="light|dark"> by the script in index.html
+  (saved choice first, then the system setting) and by the toggle in the header.
+*/
+
+:root {
+  /* ---- Type ---- */
+  --font: "Instrument Sans", Inter, system-ui, sans-serif;
+  --font-display: "Instrument Serif", Georgia, serif; /* the greeting only */
+
+  --fs-small: 12px;   /* meta, captions */
+  --fs-body: 14px;    /* body, controls, cells */
+  --fs-read: 15px;    /* longer reading text in the topic panel */
+  --fs-section: 16px; /* panel titles */
+  --fs-topic: 22px;   /* the open topic's name */
+  --fs-figure: 32px;  /* the four status counts */
+  --fs-greeting: 44px;
+
+  /* ---- Space (4px base, one gap everywhere) ---- */
+  --gap: 16px;
+  --pad: 20px;        /* inside a panel */
+  --page-pad: 24px;   /* inside the sheet */
+  --column: 1180px;   /* the centred content column */
+
+  /* ---- Shape ---- */
+  --radius-sheet: 16px;
+  --radius-panel: 22px;
+  --radius-card: 14px; /* cards inside a panel step down */
+  --radius-chip: 999px;
+  --control-height: 38px;
+
+  /* ---- Motion: feedback only ---- */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --fast: 120ms;
+  --slow: 200ms;
+
+  /* ---- Colour: light ---- */
+  color-scheme: light;
+  --chrome: #f4f5f3;   /* the frame around the sheet: a faint leaf-grey */
+  --ground: #ffffff;   /* the sheet */
+  --surface: #f7f8f7;  /* tonal panels on the sheet */
+  --raised: #ffffff;   /* cards inside a panel */
+  --active: #ebedeb;   /* hover and pressed fills */
+  --border: #e6e8e6;
+  --rule: #eff1ef;
+  --control: #d5d8d5;  /* input and button borders */
+
+  --text: #1f201d;
+  --muted: #5e605c;    /* 4.5:1 or better on every surface */
+
+  --accent: #1b6e66;   /* deep teal: "Done", the next topic, the main data */
+  --primary: #1f201d;  /* the one filled button: near-black */
+  --on-primary: #ffffff;
+  --focus: #1f201d;
+
+  /* Status: each has an ink for text and marks, and a pale fill for cards */
+  --done: #1b6e66;
+  --done-bg: #e3f1ee;
+  --learning: #8a4b0c;
+  --learning-mark: #d48a1f;
+  --learning-bg: #fcf1df;
+  --stuck: #b42318;
+  --stuck-bg: #fdecea;
+  --todo-mark: #c9ccc8;
+
+  --success: #1b6e66;
+  --error: #b42318;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --chrome: #0b0b0b;
+  --ground: #121212;
+  --surface: #1a1a1a;
+  --raised: #222222;
+  --active: #2c2c2c;
+  --border: #2a2a2a;
+  --rule: #242424;
+  --control: #444444;
+
+  --text: #f2f2f0;
+  --muted: #b4b4b4;
+
+  --accent: #5cc0b3;
+  --primary: #f2f2f0;  /* inverted: light fill, dark label */
+  --on-primary: #121212;
+  --focus: #f2f2f0;
+
+  --done: #5cc0b3;
+  --done-bg: #16302c;
+  --learning: #e8b264;
+  --learning-mark: #e8b264;
+  --learning-bg: #33280f;
+  --stuck: #f2836f;
+  --stuck-bg: #3a1d19;
+  --todo-mark: #4a4a4a;
+
+  --success: #5cc0b3;
+  --error: #f2836f;
+}
