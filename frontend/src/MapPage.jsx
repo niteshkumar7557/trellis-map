@@ -26,6 +26,7 @@ export default function MapPage({ user, selectedSubjectId }) {
 
   // Progress and next-topic reload together whenever a status is saved.
   const loadProgress = useCallback(async (subjectId) => {
+    if (!subjectId) return;
     const [{ progress }, { next }] = await Promise.all([
       apiFetch(`/api/subjects/${subjectId}/progress`),
       apiFetch(`/api/subjects/${subjectId}/next`),
@@ -133,7 +134,12 @@ export default function MapPage({ user, selectedSubjectId }) {
         })}
       </ul>
 
-      <section className="panel map" aria-labelledby="map-title">
+      <section
+        className="panel map"
+        aria-labelledby="map-title"
+        data-subject-id={selectedSubjectId}
+        data-subject-slug={subject.slug}
+      >
         <div className="panel-head">
           <h2 id="map-title">Learning order</h2>
           {selected && selected.needs.length > 0 && (
@@ -180,7 +186,7 @@ export default function MapPage({ user, selectedSubjectId }) {
           topicsById={topicsById}
           status={statusOf(selected)}
           note={noteById[selected.id] ?? ""}
-          onSaved={() => loadProgress(subject.id)}
+          onSaved={() => loadProgress(selectedSubjectId ?? subject.id)}
           onClose={() => setSelectedId(null)}
         />
       )}
