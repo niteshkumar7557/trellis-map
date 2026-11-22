@@ -4,6 +4,8 @@ import {
   JAVASCRIPT_TOPICS,
   MONGODB_SUBJECT,
   MONGODB_TOPICS,
+  REACT_SUBJECT,
+  REACT_TOPICS,
   seedSubject,
 } from "../../prisma/seed.js";
 import { sortTopics } from "./sortTopics.js";
@@ -115,6 +117,101 @@ describe("seed topic graphs and repeatability", () => {
     });
     expect(fakeDb.topicPrerequisite.createMany).toHaveBeenCalledWith({
       data: [{ topicId: 101, prerequisiteId: 101 }],
+    });
+    expect(result.topicCount).toBe(2);
+  });
+
+  it("React topic map defines 16 topics with valid metadata and mistake descriptions", () => {
+    expect(REACT_SUBJECT.slug).toBe("react");
+    expect(REACT_SUBJECT.name).toBe("React fundamentals");
+    expect(REACT_TOPICS).toHaveLength(16);
+
+    for (const topic of REACT_TOPICS) {
+      expect(topic.slug).toBeTruthy();
+      expect(topic.name).toBeTruthy();
+      expect(topic.summary).toBeTruthy();
+      expect(Array.isArray(topic.mistakes)).toBe(true);
+      expect(topic.mistakes.length).toBeGreaterThan(0);
+      expect(Array.isArray(topic.needs)).toBe(true);
+    }
+  });
+
+  it("every React topic has a unique slug and prerequisite references stay within the subject", () => {
+    const slugSet = new Set(REACT_TOPICS.map((t) => t.slug));
+    expect(slugSet.size).toBe(16);
+
+    for (const topic of REACT_TOPICS) {
+      for (const prereqSlug of topic.needs) {
+        expect(slugSet.has(prereqSlug)).toBe(true);
+      }
+    }
+  });
+
+  it("sortTopics successfully orders React fundamentals into a valid DAG without loops", () => {
+    const slugToId = new Map(REACT_TOPICS.map((t, idx) => [t.slug, idx + 1]));
+    const topicsWithIds = REACT_TOPICS.map((t) => ({
+      id: slugToId.get(t.slug),
+      slug: t.slug,
+      name: t.name,
+      summary: t.summary,
+      mistakes: t.mistakes,
+      needs: t.needs.map((s) => slugToId.get(s)),
+    }));
+
+    const sorted = sortTopics(topicsWithIds);
+    expect(sorted).toHaveLength(16);
+
+    const indexById = new Map(sorted.map((t, idx) => [t.id, idx]));
+    const levelById = new Map(sorted.map((t) => [t.id, t.level]));
+
+    for (const topic of sorted) {
+      for (const prereqId of topic.needs) {
+        expect(indexById.get(prereqId)).toBeLessThan(indexById.get(topic.id));
+        expect(levelById.get(topic.id)).toBeGreaterThan(levelById.get(prereqId));
+      }
+    }
+
+    // Root topic at level 0 is jsx
+    const rootTopics = sorted.filter((t) => t.level === 0);
+    expect(rootTopics.map((t) => t.slug)).toEqual(["jsx"]);
+  });
+
+  it("seedSubject executes idempotently for React fundamentals with scoped prerequisite deletions", async () => {
+    const fakeDb = {
+      subject: {
+        upsert: vi.fn().mockResolvedValue({ id: 200, slug: "react", name: "React fundamentals" }),
+      },
+      topic: {
+        upsert: vi.fn().mockImplementation(({ where }) =>
+          Promise.resolve({ id: 301, subjectId: where.subjectId_slug.subjectId, slug: where.subjectId_slug.slug })
+        ),
+      },
+      topicPrerequisite: {
+        deleteMany: vi.fn().mockResolvedValue({ count: 10 }),
+        createMany: vi.fn().mockResolvedValue({ count: 10 }),
+      },
+    };
+
+    const sampleTopics = [
+      { slug: "jsx", name: "JSX", summary: "s", mistakes: ["m"], needs: [] },
+      { slug: "components", name: "Components", summary: "s", mistakes: ["m"], needs: ["jsx"] },
+    ];
+
+    const result = await seedSubject(fakeDb, REACT_SUBJECT, sampleTopics);
+
+    expect(fakeDb.subject.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { slug: "react" } })
+    );
+    expect(fakeDb.topic.upsert).toHaveBeenCalledTimes(2);
+    expect(fakeDb.topicPrerequisite.deleteMany).toHaveBeenCalledWith({
+      where: {
+        topic: {
+          subjectId: 200,
+        },
+      },
+    });
+    expect(fakeDb.topicPrerequisite.createMany).toHaveBeenCalledWith({
+      data: [{ topicId: 301, prerequisiteId: 301 }],
     });
     expect(result.topicCount).toBe(2);
   });

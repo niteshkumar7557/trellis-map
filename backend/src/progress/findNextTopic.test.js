@@ -31,5 +31,46 @@ describe("findNextTopic", () => {
       findNextTopic(topics, { 1: "DONE", 2: "DONE", 3: "DONE", 4: "DONE" })
     ).toBe(null);
   });
+
+  describe("with React fundamentals topics", () => {
+    const reactTopics = [
+      { id: 1, slug: "jsx", name: "JSX and React elements", needs: [] },
+      { id: 2, slug: "components", name: "Functional components and pure rendering", needs: [1] },
+      { id: 3, slug: "props", name: "Props and component composition", needs: [2] },
+      { id: 4, slug: "events", name: "Event handling and synthetic events", needs: [2] },
+      { id: 5, slug: "lists-and-keys", name: "Conditional and list rendering (keys)", needs: [3] },
+      { id: 6, slug: "state", name: "State and snapshots (useState)", needs: [2, 4] },
+      { id: 7, slug: "reconciliation", name: "Render, commit and reconciliation", needs: [5, 6] },
+    ];
+
+    it("starts with jsx when no React topics are completed", () => {
+      expect(findNextTopic(reactTopics, {})).toEqual(reactTopics[0]);
+    });
+
+    it("moves to components once jsx is completed", () => {
+      expect(findNextTopic(reactTopics, { 1: "DONE" })).toEqual(reactTopics[1]);
+    });
+
+    it("selects props next once components is done", () => {
+      expect(findNextTopic(reactTopics, { 1: "DONE", 2: "DONE" })).toEqual(reactTopics[2]);
+    });
+
+    it("advances to state when both components and events are done", () => {
+      expect(
+        findNextTopic(reactTopics, {
+          1: "DONE",
+          2: "DONE",
+          3: "DONE",
+          4: "DONE",
+          5: "DONE",
+        })
+      ).toEqual(reactTopics[5]); // state
+    });
+
+    it("returns null when all React topics are completed", () => {
+      const allDone = Object.fromEntries(reactTopics.map((t) => [t.id, "DONE"]));
+      expect(findNextTopic(reactTopics, allDone)).toBe(null);
+    });
+  });
 });
 

@@ -78,6 +78,10 @@ light and dark mode (`docs/design.md` §15). Frontend only; no backend changes.
 as a second subject with 12 topics, DAG validation, repeatable multi-subject seed, and
 subject selection in the frontend map and admin views. All 13 test files passed (50 tests total).
 
+**React fundamentals (22 Nov 2026), branch `feat/react-fundamentals`:** added React fundamentals
+as a subject with 16 topics, DAG validation, repeatable multi-subject seed, and
+subject selection in the frontend map and admin views. All 13 test files passed (68 tests total), and frontend build verified.
+
 **Next:** the viva deadline has been extended, so the team will add new features. Add each
 feature to `docs/design.md` (what it does, its routes and fields, who owns it) before
 building it, on that owner's branch.

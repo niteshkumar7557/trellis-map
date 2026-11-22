@@ -288,6 +288,175 @@ export const MONGODB_TOPICS = [
   },
 ];
 
+export const REACT_SUBJECT = {
+  slug: "react",
+  name: "React fundamentals",
+  description: "Learn React fundamentals, component architecture, hooks, and state in topic order.",
+};
+
+export const REACT_TOPICS = [
+  {
+    slug: "jsx",
+    name: "JSX and React elements",
+    summary: "JSX syntax, React.createElement, embedding expressions, and element trees",
+    mistakes: [
+      "Treating JSX as HTML strings instead of syntactic sugar for React.createElement",
+      "Returning multiple adjacent root elements without a fragment",
+    ],
+    needs: [],
+  },
+  {
+    slug: "components",
+    name: "Functional components and pure rendering",
+    summary: "Functional components, pure rendering rules, and rendering versus DOM mutation",
+    mistakes: [
+      "Mutating external variables or DOM directly inside the render body",
+      "Calling components as plain functions instead of JSX tags",
+    ],
+    needs: ["jsx"],
+  },
+  {
+    slug: "props",
+    name: "Props and component composition",
+    summary: "Passing props, children prop, read-only props, and component composition",
+    mistakes: [
+      "Mutating props directly inside the child component",
+      "Confusing children prop composition with inheritance",
+    ],
+    needs: ["components"],
+  },
+  {
+    slug: "events",
+    name: "Event handling and synthetic events",
+    summary: "SyntheticEvent wrapper, inline vs named handlers, passing arguments, and default prevention",
+    mistakes: [
+      "Invoking the event handler immediately in JSX instead of passing a function reference (onClick={fn()})",
+      "Expecting synthetic events to work identically to native DOM events in asynchronous callbacks",
+    ],
+    needs: ["components"],
+  },
+  {
+    slug: "lists-and-keys",
+    name: "Conditional and list rendering (keys)",
+    summary: "Array mapping to JSX, stable key props, ternary and && conditional rendering",
+    mistakes: [
+      "Using array indexes as keys for dynamically reordered or filtered lists",
+      "Rendering 0 or empty arrays with && and accidentally displaying 0 in the UI",
+    ],
+    needs: ["props"],
+  },
+  {
+    slug: "state",
+    name: "State and snapshots (useState)",
+    summary: "useState hook, state as a snapshot, updater functions, and re-rendering triggers",
+    mistakes: [
+      "Mutating state objects or arrays in-place instead of creating new copies",
+      "Reading state immediately after set state and expecting the new value synchronously",
+    ],
+    needs: ["components", "events"],
+  },
+  {
+    slug: "reconciliation",
+    name: "Render, commit and reconciliation",
+    summary: "Virtual DOM diffing, render and commit phases, component identity by position and key",
+    mistakes: [
+      "Assuming state updates immediately touch the real DOM",
+      "Resetting component state unexpectedly due to redefining component functions inside parent render",
+    ],
+    needs: ["lists-and-keys", "state"],
+  },
+  {
+    slug: "controlled-inputs",
+    name: "Controlled and uncontrolled inputs",
+    summary: "Controlled input value and onChange binding, defaultValue, and form state handling",
+    mistakes: [
+      "Switching an input from uncontrolled to controlled by passing undefined value",
+      "Updating controlled input value without providing an onChange handler",
+    ],
+    needs: ["state", "events"],
+  },
+  {
+    slug: "lifting-state",
+    name: "Lifting state and derived state",
+    summary: "Sharing state between siblings via common ancestor and calculating derived values during render",
+    mistakes: [
+      "Duplicating derived state into useState instead of computing it during render",
+      "Passing down state setters through excessive layers when state belongs higher or lower",
+    ],
+    needs: ["props", "state"],
+  },
+  {
+    slug: "effects",
+    name: "Side effects and synchronization (useEffect)",
+    summary: "useEffect lifecycle, dependency array, cleanup functions, and synchronizing with external systems",
+    mistakes: [
+      "Omitting reactive values from the useEffect dependency array",
+      "Using useEffect for calculating derived state instead of doing it during render",
+    ],
+    needs: ["state", "reconciliation"],
+  },
+  {
+    slug: "refs",
+    name: "Refs and escape hatches (useRef)",
+    summary: "useRef for persistent mutable values without triggering re-render, and DOM node references",
+    mistakes: [
+      "Reading or writing ref.current during rendering rather than in effects or event handlers",
+      "Using useRef when changing values should cause the UI to re-render",
+    ],
+    needs: ["reconciliation"],
+  },
+  {
+    slug: "use-reducer",
+    name: "Complex state with useReducer",
+    summary: "useReducer hook, actions, dispatch, and predictable multi-step state transitions",
+    mistakes: [
+      "Performing side effects or mutating previous state directly inside the reducer function",
+      "Overcomplicating simple isolated states that only require useState",
+    ],
+    needs: ["lifting-state"],
+  },
+  {
+    slug: "context",
+    name: "Context API and avoiding prop drilling",
+    summary: "createContext, Provider, useContext, and broadcasting global state across the tree",
+    mistakes: [
+      "Putting high-frequency changing state into context causing unwanted re-renders across consumers",
+      "Using Context as a replacement for component composition",
+    ],
+    needs: ["props", "lifting-state"],
+  },
+  {
+    slug: "custom-hooks",
+    name: "Custom hooks and logic reuse",
+    summary: "Extracting reusable stateful logic into custom use* functions following hooks rules",
+    mistakes: [
+      "Thinking custom hooks share state values rather than state logic between component instances",
+      "Violating rules of hooks by calling hooks conditionally inside custom hooks",
+    ],
+    needs: ["effects", "refs"],
+  },
+  {
+    slug: "error-boundaries",
+    name: "Error boundaries and async UI states",
+    summary: "Class component error boundaries, getDerivedStateFromError, componentDidCatch, and suspense/loading fallbacks",
+    mistakes: [
+      "Expecting error boundaries to catch errors inside event handlers or asynchronous callbacks",
+      "Forgetting fallback UI leaving a blank screen when render crashes",
+    ],
+    needs: ["effects", "props"],
+  },
+  {
+    slug: "memoization",
+    name: "Rendering performance and memoization",
+    summary: "React.memo, useMemo, useCallback, and optimizing costly renders and object identity",
+    mistakes: [
+      "Prematurely wrapping cheap computations in useMemo adding unnecessary overhead",
+      "Passing unstable inline object or function references defeating React.memo and useCallback",
+    ],
+    needs: ["reconciliation", "custom-hooks"],
+  },
+];
+
 /**
  * Upserts a subject, its topics, and prerequisite links.
  * Preserves existing topic IDs and user progress records.
@@ -361,9 +530,25 @@ export async function seedSubject(db, subjectData, topics) {
   return { subject, topicCount: topics.length, prereqCount: prereqRows.length };
 }
 
+export const DEFAULT_SUBJECTS = [
+  { subject: JAVASCRIPT_SUBJECT, topics: JAVASCRIPT_TOPICS },
+  { subject: MONGODB_SUBJECT, topics: MONGODB_TOPICS },
+  { subject: REACT_SUBJECT, topics: REACT_TOPICS },
+];
+
+export async function seedAll(db, subjects = DEFAULT_SUBJECTS) {
+  const results = [];
+  for (const entry of subjects) {
+    if (entry.topics && entry.topics.length > 0) {
+      const res = await seedSubject(db, entry.subject, entry.topics);
+      results.push(res);
+    }
+  }
+  return results;
+}
+
 async function main() {
-  await seedSubject(prisma, JAVASCRIPT_SUBJECT, JAVASCRIPT_TOPICS);
-  await seedSubject(prisma, MONGODB_SUBJECT, MONGODB_TOPICS);
+  await seedAll(prisma);
 }
 
 // Run when called directly by "node prisma/seed.js"
