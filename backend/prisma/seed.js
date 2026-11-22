@@ -226,6 +226,66 @@ export const MONGODB_TOPICS = [
     ],
     needs: ["crud-find"],
   },
+  {
+    slug: "arrays-query",
+    name: "Querying arrays",
+    summary: "Array field queries, $all, $size, $elemMatch, and element querying",
+    mistakes: [
+      "Expecting multiple conditions on array elements to match the same element without $elemMatch",
+      "checking array length with comparison operators instead of $size",
+    ],
+    needs: ["nested-documents"],
+  },
+  {
+    slug: "array-updates",
+    name: "Updating arrays",
+    summary: "Array update operators: $push, $pull, $addToSet, and the positional operator ($)",
+    mistakes: [
+      "Using $push when avoiding duplicates requires $addToSet",
+      "mutating the wrong array element with improper positional operators",
+    ],
+    needs: ["crud-update", "arrays-query"],
+  },
+  {
+    slug: "crud-delete",
+    name: "Deleting documents",
+    summary: "deleteOne, deleteMany, and drop collection",
+    mistakes: [
+      "Calling deleteMany with an empty filter and wiping all documents",
+      "confusing drop collection with deleting documents",
+    ],
+    needs: ["crud-find"],
+  },
+  {
+    slug: "indexes",
+    name: "Indexes and performance",
+    summary: "Single field indexes, compound indexes, explain(), and COLLSCAN vs IXSCAN",
+    mistakes: [
+      "Creating too many indexes and slowing down writes",
+      "indexing fields in compound indexes in an order that violates equality-sort-range rules",
+    ],
+    needs: ["crud-find"],
+  },
+  {
+    slug: "aggregation-pipeline",
+    name: "Aggregation pipeline basics",
+    summary: "Pipeline concept, $match, $project, $limit, $skip, and $sort",
+    mistakes: [
+      "Putting $project before $match and preventing index usage",
+      "confusing find() filters with aggregation stage syntax",
+    ],
+    needs: ["comparison-operators"],
+  },
+  {
+    slug: "aggregation-group",
+    name: "Grouping and transforming",
+    summary: "$group, accumulator expressions ($sum, $avg, $push), and $unwind",
+    mistakes: [
+      "Forgetting that _id is required in $group",
+      "expecting $unwind to keep empty arrays without preserveNullAndEmptyArrays",
+    ],
+    needs: ["aggregation-pipeline", "array-updates"],
+  },
 ];
 
 /**
