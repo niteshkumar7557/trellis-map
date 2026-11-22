@@ -159,6 +159,75 @@ export const JAVASCRIPT_TOPICS = [
   },
 ];
 
+export const MONGODB_SUBJECT = {
+  slug: "mongodb",
+  name: "MongoDB fundamentals",
+  description: "Learn MongoDB fundamentals, document modeling, queries, and aggregations in topic order.",
+};
+
+export const MONGODB_TOPICS = [
+  {
+    slug: "documents",
+    name: "Documents and BSON",
+    summary: "Documents, collections, JSON vs BSON, and field types (ObjectId, string, number, date)",
+    mistakes: [
+      "Thinking MongoDB is schemaless with no structure needed",
+      "using strings for IDs instead of ObjectId",
+    ],
+    needs: [],
+  },
+  {
+    slug: "crud-insert",
+    name: "Inserting documents",
+    summary: "insertOne, insertMany, auto-generated _id, and write concern basics",
+    mistakes: [
+      "Re-inserting the same _id and hitting duplicate key errors",
+      "expecting insertMany to roll back on partial failure without transactions",
+    ],
+    needs: ["documents"],
+  },
+  {
+    slug: "crud-find",
+    name: "Querying documents",
+    summary: "find, findOne, query filters, equality, and projections",
+    mistakes: [
+      "Omitting projection for unwanted fields",
+      "confusing query filter syntax with projection syntax",
+    ],
+    needs: ["documents"],
+  },
+  {
+    slug: "comparison-operators",
+    name: "Comparison and logical operators",
+    summary: "$eq, $ne, $gt, $gte, $lt, $lte, $in, $and, $or, $nor",
+    mistakes: [
+      "Forgetting that $in takes an array",
+      "wrapping multiple fields in $and when implicit AND works",
+    ],
+    needs: ["crud-find"],
+  },
+  {
+    slug: "nested-documents",
+    name: "Embedded documents and dot notation",
+    summary: "Querying and updating nested fields with dot notation and nested object equality",
+    mistakes: [
+      "Matching an entire subdocument when matching a single nested field was intended",
+      'forgetting quotes in dot notation ("address.city")',
+    ],
+    needs: ["crud-find"],
+  },
+  {
+    slug: "crud-update",
+    name: "Updating documents",
+    summary: "updateOne, updateMany, replaceOne, and field update operators ($set, $unset, $inc)",
+    mistakes: [
+      "Forgetting $set and accidentally replacing the entire document",
+      "assuming updateOne updates all matching rows",
+    ],
+    needs: ["crud-find"],
+  },
+];
+
 /**
  * Upserts a subject, its topics, and prerequisite links.
  * Preserves existing topic IDs and user progress records.
@@ -234,6 +303,7 @@ export async function seedSubject(db, subjectData, topics) {
 
 async function main() {
   await seedSubject(prisma, JAVASCRIPT_SUBJECT, JAVASCRIPT_TOPICS);
+  await seedSubject(prisma, MONGODB_SUBJECT, MONGODB_TOPICS);
 }
 
 // Run when called directly by "node prisma/seed.js"
