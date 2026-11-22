@@ -405,6 +405,56 @@ export const REACT_TOPICS = [
     ],
     needs: ["reconciliation"],
   },
+  {
+    slug: "use-reducer",
+    name: "Complex state with useReducer",
+    summary: "useReducer hook, actions, dispatch, and predictable multi-step state transitions",
+    mistakes: [
+      "Performing side effects or mutating previous state directly inside the reducer function",
+      "Overcomplicating simple isolated states that only require useState",
+    ],
+    needs: ["lifting-state"],
+  },
+  {
+    slug: "context",
+    name: "Context API and avoiding prop drilling",
+    summary: "createContext, Provider, useContext, and broadcasting global state across the tree",
+    mistakes: [
+      "Putting high-frequency changing state into context causing unwanted re-renders across consumers",
+      "Using Context as a replacement for component composition",
+    ],
+    needs: ["props", "lifting-state"],
+  },
+  {
+    slug: "custom-hooks",
+    name: "Custom hooks and logic reuse",
+    summary: "Extracting reusable stateful logic into custom use* functions following hooks rules",
+    mistakes: [
+      "Thinking custom hooks share state values rather than state logic between component instances",
+      "Violating rules of hooks by calling hooks conditionally inside custom hooks",
+    ],
+    needs: ["effects", "refs"],
+  },
+  {
+    slug: "error-boundaries",
+    name: "Error boundaries and async UI states",
+    summary: "Class component error boundaries, getDerivedStateFromError, componentDidCatch, and suspense/loading fallbacks",
+    mistakes: [
+      "Expecting error boundaries to catch errors inside event handlers or asynchronous callbacks",
+      "Forgetting fallback UI leaving a blank screen when render crashes",
+    ],
+    needs: ["effects", "props"],
+  },
+  {
+    slug: "memoization",
+    name: "Rendering performance and memoization",
+    summary: "React.memo, useMemo, useCallback, and optimizing costly renders and object identity",
+    mistakes: [
+      "Prematurely wrapping cheap computations in useMemo adding unnecessary overhead",
+      "Passing unstable inline object or function references defeating React.memo and useCallback",
+    ],
+    needs: ["reconciliation", "custom-hooks"],
+  },
 ];
 
 /**
