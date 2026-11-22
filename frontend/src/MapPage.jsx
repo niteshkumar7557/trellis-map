@@ -13,7 +13,7 @@ function nameList(list) {
   return list.length > 2 ? `${names} and ${list.length - 2} more` : names;
 }
 
-// The map: the subject's topics in learning order, one row per level.
+// The map: the selected subject's topics in learning order, one row per level.
 export default function MapPage({ user }) {
   const [subjects, setSubjects] = useState([]);
   const [selectedSubjectId, setSelectedSubjectId] = useState(() => {
@@ -40,8 +40,9 @@ export default function MapPage({ user }) {
     setNext(next);
   }, []);
 
+  // Fetch subject list once on mount and establish initial subject
   useEffect(() => {
-    async function load() {
+    async function initSubjects() {
       try {
         const { subjects: list } = await apiFetch("/api/subjects");
         if (list.length === 0) throw new Error("No subjects yet. Run the seed.");
@@ -52,18 +53,41 @@ export default function MapPage({ user }) {
           : list[0].id;
 
         setSelectedSubjectId(targetId);
-        const data = await apiFetch(`/api/subjects/${targetId}/topics`);
-        setSubject(data.subject);
-        setTopics(data.topics);
-        await loadProgress(targetId);
       } catch (err) {
         setError(err.message);
       }
     }
-    load();
-  }, [loadProgress]);
+    initSubjects();
+  }, []);
+
+  // Whenever selectedSubjectId changes, drive the topic map and load its topics & progress
+  useEffect(() => {
+    if (!selectedSubjectId) return;
+
+    let cancelled = false;
+    async function loadSubjectData() {
+      try {
+        setError("");
+        setSelectedId(null); // Close any topic panel from a previous subject
+        const data = await apiFetch(`/api/subjects/${selectedSubjectId}/topics`);
+        if (cancelled) return;
+
+        setSubject(data.subject);
+        setTopics(data.topics);
+        await loadProgress(selectedSubjectId);
+      } catch (err) {
+        if (!cancelled) setError(err.message);
+      }
+    }
+
+    loadSubjectData();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedSubjectId, loadProgress]);
 
   function handleSelectSubject(id) {
+    if (id === selectedSubjectId) return;
     setSelectedSubjectId(id);
     localStorage.setItem("trellis-subject-id", String(id));
   }
@@ -96,22 +120,21 @@ export default function MapPage({ user }) {
     <main className={selected ? "page map-layout has-panel" : "page map-layout"}>
       {subjects.length > 1 && (
         <div className="subject-bar" role="tablist" aria-label="Select subject">
-          {subjects.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              role="tab"
-              aria-selected={s.id === (subject?.id ?? selectedSubjectId)}
-              className={
-                s.id === (subject?.id ?? selectedSubjectId)
-                  ? "subject-tab is-active"
-                  : "subject-tab"
-              }
-              onClick={() => handleSelectSubject(s.id)}
-            >
-              {s.name}
-            </button>
-          ))}
+          {subjects.map((s) => {
+            const isActive = s.id === selectedSubjectId;
+            return (
+              <button
+                key={s.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                className={isActive ? "subject-tab is-active" : "subject-tab"}
+                onClick={() => handleSelectSubject(s.id)}
+              >
+                {s.name}
+              </button>
+            );
+          })}
         </div>
       )}
 
