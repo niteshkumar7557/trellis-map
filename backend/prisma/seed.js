@@ -355,6 +355,56 @@ export const REACT_TOPICS = [
     ],
     needs: ["components", "events"],
   },
+  {
+    slug: "reconciliation",
+    name: "Render, commit and reconciliation",
+    summary: "Virtual DOM diffing, render and commit phases, component identity by position and key",
+    mistakes: [
+      "Assuming state updates immediately touch the real DOM",
+      "Resetting component state unexpectedly due to redefining component functions inside parent render",
+    ],
+    needs: ["lists-and-keys", "state"],
+  },
+  {
+    slug: "controlled-inputs",
+    name: "Controlled and uncontrolled inputs",
+    summary: "Controlled input value and onChange binding, defaultValue, and form state handling",
+    mistakes: [
+      "Switching an input from uncontrolled to controlled by passing undefined value",
+      "Updating controlled input value without providing an onChange handler",
+    ],
+    needs: ["state", "events"],
+  },
+  {
+    slug: "lifting-state",
+    name: "Lifting state and derived state",
+    summary: "Sharing state between siblings via common ancestor and calculating derived values during render",
+    mistakes: [
+      "Duplicating derived state into useState instead of computing it during render",
+      "Passing down state setters through excessive layers when state belongs higher or lower",
+    ],
+    needs: ["props", "state"],
+  },
+  {
+    slug: "effects",
+    name: "Side effects and synchronization (useEffect)",
+    summary: "useEffect lifecycle, dependency array, cleanup functions, and synchronizing with external systems",
+    mistakes: [
+      "Omitting reactive values from the useEffect dependency array",
+      "Using useEffect for calculating derived state instead of doing it during render",
+    ],
+    needs: ["state", "reconciliation"],
+  },
+  {
+    slug: "refs",
+    name: "Refs and escape hatches (useRef)",
+    summary: "useRef for persistent mutable values without triggering re-render, and DOM node references",
+    mistakes: [
+      "Reading or writing ref.current during rendering rather than in effects or event handlers",
+      "Using useRef when changing values should cause the UI to re-render",
+    ],
+    needs: ["reconciliation"],
+  },
 ];
 
 /**
