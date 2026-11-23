@@ -138,4 +138,64 @@ describe("sortTopics", () => {
       expect(err.message).toMatch(/loop/i);
     }
   });
+
+  it("the 12 Node.js fundamentals topics sort in learning order and calculate exact levels", () => {
+    const nodeTopics = [
+      { id: 1, slug: "node-runtime", name: "Node.js runtime and CLI", needs: [] },
+      { id: 2, slug: "modules", name: "CommonJS and ES modules", needs: [1] },
+      { id: 3, slug: "process-env", name: "Process and environment variables", needs: [1] },
+      { id: 4, slug: "buffers", name: "Buffers and binary data", needs: [1] },
+      { id: 5, slug: "path-url", name: "Path and URL utilities", needs: [2] },
+      { id: 6, slug: "events", name: "EventEmitter and event-driven architecture", needs: [2] },
+      { id: 7, slug: "npm-packages", name: "NPM and package management", needs: [2] },
+      { id: 8, slug: "fs-promises", name: "File system with promises", needs: [5] },
+      { id: 9, slug: "streams", name: "Streams and piping", needs: [6, 4] },
+      { id: 10, slug: "http-server", name: "HTTP server fundamentals", needs: [9, 8] },
+      { id: 11, slug: "express-basics", name: "Express basics and routing", needs: [10, 7] },
+      { id: 12, slug: "middleware", name: "Middleware and error handling", needs: [11] },
+    ];
+
+    const sorted = sortTopics(nodeTopics);
+    expect(sorted).toHaveLength(12);
+
+    const indexById = new Map(sorted.map((t, idx) => [t.id, idx]));
+    const levelBySlug = new Map(sorted.map((t) => [t.slug, t.level]));
+
+    // Prerequisites must strictly precede dependent topics
+    for (const topic of sorted) {
+      for (const prereqId of topic.needs) {
+        expect(indexById.get(prereqId)).toBeLessThan(indexById.get(topic.id));
+      }
+    }
+
+    // Exact topological levels
+    expect(levelBySlug.get("node-runtime")).toBe(0);
+    expect(levelBySlug.get("modules")).toBe(1);
+    expect(levelBySlug.get("process-env")).toBe(1);
+    expect(levelBySlug.get("buffers")).toBe(1);
+    expect(levelBySlug.get("path-url")).toBe(2);
+    expect(levelBySlug.get("events")).toBe(2);
+    expect(levelBySlug.get("npm-packages")).toBe(2);
+    expect(levelBySlug.get("fs-promises")).toBe(3);
+    expect(levelBySlug.get("streams")).toBe(3);
+    expect(levelBySlug.get("http-server")).toBe(4);
+    expect(levelBySlug.get("express-basics")).toBe(5);
+    expect(levelBySlug.get("middleware")).toBe(6);
+  });
+
+  it("detects cyclic dependencies in Node.js topics and throws HttpError 400", () => {
+    const cyclicNodeTopics = [
+      { id: 1, slug: "modules", name: "Modules", needs: [2] },
+      { id: 2, slug: "path-url", name: "Path & URL", needs: [1] },
+    ];
+
+    try {
+      sortTopics(cyclicNodeTopics);
+      expect.unreachable("Should have thrown HttpError 400");
+    } catch (err) {
+      expect(err).toBeInstanceOf(HttpError);
+      expect(err.status).toBe(400);
+      expect(err.message).toMatch(/loop/i);
+    }
+  });
 });

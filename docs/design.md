@@ -512,7 +512,7 @@ and no internet. Run them with `npm test` (which is `vitest run`) inside `backen
 
 | Part | What is tested |
 |---|---|
-| 1 | `sortTopics` orders topics, gives the right levels, and catches a loop; the error handler sends the right status and shape; `seedGraph.test.js` verifies topic graph validity, acyclicity, and repeatable seeding across all subjects (JS, Node.js, MongoDB, React) |
+| 1 | `sortTopics` orders topics, gives the right levels, and catches a loop (tested for JS, Node.js, and React); the error handler sends the right status and shape; `seedGraph.test.js` verifies topic graph validity, acyclicity, and repeatable seeding across all subjects (JS, Node.js, MongoDB, React) |
 | 2 | hash then check a password; sign then check a token; `requireAuth` (no token, bad token, good token); `requireAdmin` (student gets 403, admin passes) |
 | 3 | `checkRefreshToken` refuses used and expired tokens; `findOrCreateGoogleUser` with a fake database: existing Google user, existing email, new user |
 | 4 | `findNextTopic`, `findStuckHint` and `buildPrompt` across topics; `improvePrompt` with a faked `fetch`: success, error and timeout |

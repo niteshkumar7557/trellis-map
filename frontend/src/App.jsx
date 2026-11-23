@@ -119,6 +119,7 @@ function SignedIn({ user, onLogout, subjects, selectedSubjectId, onSelectSubject
                   aria-selected={s.id === selectedSubjectId}
                   className={s.id === selectedSubjectId ? "nav-link active" : "nav-link"}
                   onClick={() => onSelectSubject(s.id)}
+                  title={s.description}
                 >
                   {s.name}
                 </button>
