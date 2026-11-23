@@ -190,6 +190,8 @@
   border-radius: var(--radius-chip);
   padding: 2px 10px;
   margin-bottom: 8px;
+  user-select: none;
+  cursor: default;
 }
 
 .map-subject-badge .dot {

@@ -98,7 +98,11 @@ export default function MapPage({ user, selectedSubjectId }) {
     >
       <div className="title-row">
         <div>
-          <div className="map-subject-badge" aria-label={`Current subject: ${subject.name}`}>
+          <div
+            className="map-subject-badge"
+            aria-label={`Current subject: ${subject.name}`}
+            title={subject.description}
+          >
             <span className="dot status-DONE" aria-hidden="true" />
             <span className="badge-text">{subject.name}</span>
           </div>
