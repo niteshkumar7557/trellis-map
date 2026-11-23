@@ -159,6 +159,14 @@ export const JAVASCRIPT_TOPICS = [
   },
 ];
 
+export const NODEJS_SUBJECT = {
+  slug: "nodejs",
+  name: "Node.js fundamentals",
+  description: "Server-side JavaScript runtime, core modules, asynchronous I/O, and HTTP servers",
+};
+
+export const NODEJS_TOPICS = [];
+
 export const MONGODB_SUBJECT = {
   slug: "mongodb",
   name: "MongoDB fundamentals",
@@ -532,6 +540,7 @@ export async function seedSubject(db, subjectData, topics) {
 
 export const DEFAULT_SUBJECTS = [
   { subject: JAVASCRIPT_SUBJECT, topics: JAVASCRIPT_TOPICS },
+  { subject: NODEJS_SUBJECT, topics: NODEJS_TOPICS },
   { subject: MONGODB_SUBJECT, topics: MONGODB_TOPICS },
   { subject: REACT_SUBJECT, topics: REACT_TOPICS },
 ];
