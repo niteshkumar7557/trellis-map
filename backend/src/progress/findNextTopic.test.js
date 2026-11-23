@@ -72,5 +72,45 @@ describe("findNextTopic", () => {
       expect(findNextTopic(reactTopics, allDone)).toBe(null);
     });
   });
+
+  describe("with Node.js fundamentals topics", () => {
+    const nodeTopics = [
+      { id: 1, slug: "node-runtime", name: "Node.js runtime and CLI", needs: [] },
+      { id: 2, slug: "modules", name: "CommonJS and ES modules", needs: [1] },
+      { id: 3, slug: "process-env", name: "Process and environment variables", needs: [1] },
+      { id: 4, slug: "buffers", name: "Buffers and binary data", needs: [1] },
+      { id: 5, slug: "path-url", name: "Path and URL utilities", needs: [2] },
+      { id: 6, slug: "events", name: "EventEmitter and event-driven architecture", needs: [2] },
+      { id: 7, slug: "npm-packages", name: "NPM and package management", needs: [2] },
+      { id: 8, slug: "fs-promises", name: "File system with promises", needs: [5] },
+      { id: 9, slug: "streams", name: "Streams and piping", needs: [6, 4] },
+      { id: 10, slug: "http-server", name: "HTTP server fundamentals", needs: [9, 8] },
+      { id: 11, slug: "express-basics", name: "Express basics and routing", needs: [10, 7] },
+      { id: 12, slug: "middleware", name: "Middleware and error handling", needs: [11] },
+    ];
+
+    it("starts with node-runtime when no Node.js topics are completed", () => {
+      expect(findNextTopic(nodeTopics, {})).toEqual(nodeTopics[0]);
+    });
+
+    it("moves to modules once node-runtime is completed", () => {
+      expect(findNextTopic(nodeTopics, { 1: "DONE" })).toEqual(nodeTopics[1]);
+    });
+
+    it("suggests http-server when streams and fs-promises are finished", () => {
+      const statusById = {
+        1: "DONE",
+        2: "DONE",
+        3: "DONE",
+        4: "DONE",
+        5: "DONE",
+        6: "DONE",
+        7: "DONE",
+        8: "DONE",
+        9: "DONE",
+      };
+      expect(findNextTopic(nodeTopics, statusById)).toEqual(nodeTopics[9]);
+    });
+  });
 });
 
