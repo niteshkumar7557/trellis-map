@@ -643,3 +643,104 @@ consistent. Built with Claude Code (Nitesh); not part of the viva.
   and topics stack.
 - **Motion.** Feedback only (hover, press, the panel opening), and none when the system
   asks for reduced motion.
+
+## 16. Landing page
+
+The public front page. **Frontend only** (no backend change), built with Claude Code
+(Nitesh); not part of the viva.
+
+**Where it lives.** Signed out, `/` shows the landing page. Signed in, `/` stays the map.
+No URL moves, and Google sign-in still lands on the map.
+
+**The idea: the page is the map.** The first screen is the real map of a subject, drawn
+with the app's own map styles, and every section after it shows one rule Trellis runs on
+it, worked out live on a sample student.
+
+| Section | What it shows |
+|---|---|
+| Hero | "The map of what you're learning." The subject's topics in learning order, one row per step, with the sample student's statuses and the next topic marked. A switcher picks one of the subjects. Pointing at a topic shows its summary, its status, what it needs, and whether it's next |
+| Stuck | "Stuck is traced, not guessed." The sample student is stuck on Promises. The trace runs one step down to the topics Promises needs, shows each one's status, and names the weakest first (§8: not started, then stuck, then learning) |
+| Prompt | "Your AI teaches. Trellis writes the prompt." The prompt for that stuck topic in its **three parts** (below), each lit on hover from its source, a working Copy button, and one line on "Improve with AI" |
+| Subjects | Every subject as a miniature of its map, with its topic and step counts. Each links to sign-up |
+| What it won't do | Five promises (teach, nag, judge, tell, forget) beside an espalier drawing that turns through the seasons |
+| Start | One card: "Start your map", to sign-up, and a link to log in |
+| Footer | Product links, the subjects, the promises, and the name across the page |
+
+**Where the numbers come from.** Nothing on the page is typed in by hand:
+
+- **The topics:** the public `GET /api/subjects` and `GET /api/subjects/:id/topics`.
+- **The sample student:** a fixed status for some topics, by slug, in
+  `frontend/src/landing/sample.js`.
+- **The next topic and the stuck hint:** the backend's own `findNextTopic.js` and
+  `findStuckHint.js`.
+  - They're plain functions with no imports, so the frontend imports them straight from
+    `backend/src/progress/`, through the Vite alias `@rules`.
+  - If a rule changes, the landing page changes with it.
+- **The prompt:** `buildLayeredPrompt` in `frontend/src/landing/layeredPrompt.js`. It uses
+  the three-part structure prompts are moving to (see "The three-part prompt" below).
+- **If the API isn't reachable:** the live sections say so in one line. The rest of the
+  page still shows.
+
+**The look.**
+
+- The same layout as a poster-style landing: a wall with paper sheets on it.
+- Instrument Serif headings, Instrument Sans text, and the app's teal and status
+  colours.
+- **It follows the theme.** In light mode the wall behind the hero and the footer is
+  white; in dark mode it is charcoal. The hero map uses the app's own tokens for the
+  theme the visitor is in, so it looks exactly like the map screen.
+- The page has its own `--l-*` tokens in `frontend/src/landing/landing.css` for its whole
+  fields of colour, set once for light and once for dark.
+- Pictures are SVG drawn in code; there are no image files.
+
+**Motion (GSAP).** The frontend now depends on `gsap` and `@gsap/react`.
+
+- The hero map grows one step at a time, its links drawn just before its topics appear.
+- On wide screens the stuck section is pinned while the trace plays with the scroll.
+- Each section's parts rise in once as it arrives, and the espalier turns through its
+  seasons.
+- If the system asks for less motion, everything shows in its finished state.
+
+**Files.** All in `frontend/src/landing/`:
+
+| File | What it holds |
+|---|---|
+| `Landing.jsx` | The frame and the small sections |
+| `HeroMap.jsx` | The hero map |
+| `StuckTrace.jsx` | The stuck scene |
+| `PromptSlip.jsx` | The prompt slip |
+| `MiniMap.jsx` | A subject's miniature |
+| `Espalier.jsx` | The drawing |
+| `sample.js` | The sample student, and the data loading |
+| `layeredPrompt.js` | The three-part prompt (below) |
+| `landing.css` | The page's styles and `--l-*` tokens |
+
+Also new is `frontend/src/lib/gsap.js`, which registers the plugins once. In `App.jsx`, the
+`/` route chooses between the landing page and the map. A server that doesn't answer now
+counts as signed out, so the landing page still shows. `MapPage.jsx` exports its
+`TopicNode`, so the hero draws the same boxes as the map.
+
+**The three-part prompt (planned for the backend).** The landing page already shows it; the
+backend's `buildPrompt` will move to the same structure later (Nitesh). The prompt is
+assembled, never generated, in three parts:
+
+1. **Known:** what the map says.
+   - The topic's status, as a sentence: "I'm learning JavaScript fundamentals and I'm
+     stuck on Promises."
+   - Each topic it needs, grouped: "I'm comfortable with…" (Done), "I'm shaky on…"
+     (Learning or Stuck), "I haven't studied… yet" (Not started).
+   - When stuck, the hint's topic is named as "my real gap".
+2. **From my own notes:** this topic's note, plus the notes of up to two topics it needs
+   that are Done (what worked there).
+3. **How I'd like you to help:** fixed lines, in this order:
+   - one or two lines for the topic's status (Stuck: start with the gap, then explain it a
+     different way; Done: quiz me first; Learning: pick up where I stopped; Not started:
+     tell me where it fits);
+   - the topic's common mistakes ("Watch for the usual traps: …");
+   - five lines for every prompt: small steps with a question after each, short examples,
+     no lecturing, use my notes without reminding me of past mistakes, and end with two
+     lines to paste back.
+
+**Checks.** The frontend has no test runner. The page is checked with `npm run build` and
+in a browser at desktop and phone widths, in light and dark, with and without reduced
+motion.

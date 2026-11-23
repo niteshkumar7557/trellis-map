@@ -86,6 +86,12 @@ subject selection in the frontend map and admin views. All 13 test files passed 
 as a subject with 12 topics, DAG validation, repeatable multi-subject seed, and
 subject selection in the frontend map and admin views. All 13 test files passed (81 tests total), and frontend build verified.
 
+**Landing page (23 Nov 2026), branch `feat/landing-page`:** a public front page at `/` for
+signed-out visitors (signed in, `/` stays the map): a live hero map, the stuck trace, the
+prompt in three parts, the subjects, "What it won't do" and a start card. Frontend only;
+adds `gsap` and `@gsap/react`. `docs/design.md` §16 has everything, including the
+three-part prompt the backend's `buildPrompt` will move to.
+
 **Next:** the viva deadline has been extended, so the team will add new features. Add each
 feature to `docs/design.md` (what it does, its routes and fields, who owns it) before
 building it, on that owner's branch.
