@@ -93,6 +93,10 @@ export default function MapPage({ user, selectedSubjectId }) {
     <main className={selected ? "page map-layout has-panel" : "page map-layout"}>
       <div className="title-row">
         <div>
+          <div className="map-subject-badge" aria-label={`Current subject: ${subject.name}`}>
+            <span className="dot status-DONE" aria-hidden="true" />
+            <span className="badge-text">{subject.name}</span>
+          </div>
           <h1 className="greeting">
             {next ? `${firstName}, ${next.name} is next.` : `${firstName}, every topic is done.`}
           </h1>
