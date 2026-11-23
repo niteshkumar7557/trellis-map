@@ -209,14 +209,16 @@ export default function MapPage({ user, selectedSubjectId }) {
   );
 }
 
-function TopicNode({ topic, status, isNext, isSelected, isNeeded, onSelect }) {
+// Exported for the landing page's hero map, which draws the same boxes, so the two can't
+// look different (design.md §16). `rest` lets it add a hover handler.
+export function TopicNode({ topic, status, isNext, isSelected, isNeeded, onSelect, ...rest }) {
   const classes = ["topic", `status-${status}`];
   if (isNext) classes.push("is-next");
   if (isSelected) classes.push("is-selected");
   if (isNeeded) classes.push("is-needed");
 
   return (
-    <button className={classes.join(" ")} onClick={onSelect} aria-pressed={isSelected}>
+    <button className={classes.join(" ")} onClick={onSelect} aria-pressed={isSelected} {...rest}>
       {isNext && <span className="topic-next">Next up</span>}
       <span className="topic-name">{topic.name}</span>
       <span className="topic-status">

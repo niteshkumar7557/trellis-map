@@ -4,6 +4,7 @@ import { apiFetch, logout, restoreSession } from "./api.js";
 import AuthForm from "./AuthForm.jsx";
 import MapPage from "./MapPage.jsx";
 import AdminPage from "./AdminPage.jsx";
+import Landing from "./landing/Landing.jsx";
 import { Brand, ThemeToggle } from "./ui.jsx";
 
 export default function App() {
@@ -16,7 +17,9 @@ export default function App() {
   });
 
   useEffect(() => {
-    restoreSession().then(setUser);
+    // A server that doesn't answer means "signed out", not "loading for ever", so the
+    // landing page still shows.
+    restoreSession().then(setUser, () => setUser(null));
   }, []);
 
   // Load subject list once user is signed in
@@ -88,7 +91,11 @@ export default function App() {
         path="/signup"
         element={user ? <Navigate to="/" /> : <AuthForm mode="signup" onSignedIn={setUser} />}
       />
-      <Route path="/" element={signedIn(<MapPage user={user} selectedSubjectId={selectedSubjectId} />)} />
+      {/* Signed out, / is the landing page; signed in, it is the map (design.md §16). */}
+      <Route
+        path="/"
+        element={user ? signedIn(<MapPage user={user} selectedSubjectId={selectedSubjectId} />) : <Landing />}
+      />
       <Route
         path="/admin"
         element={signedIn(user?.role === "ADMIN" ? <AdminPage initialSubjectId={selectedSubjectId} /> : <Navigate to="/" />)}

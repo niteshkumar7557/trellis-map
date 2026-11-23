@@ -1,0 +1,928 @@
+/*
+  Landing: the page is the map (design.md §16). The app's type (Instrument Sans, with
+  Instrument Serif for headings) and the app's palette: a wall (white by day, charcoal at
+  night), paper grounds, the deep-teal accent, and the status colours on data.
+
+  Grid: 12 columns, 32px outer margins (16px on a phone), one gutter.
+  Type sizes, each with one job:
+    --t-display   the hero line, and the "won't do" heading
+    --t-heading   one per section
+    --t-title     names of things: a subject, the start card
+    --t-lead      the sentence under a heading
+    --t-body      running text
+    --t-small     captions and notes
+
+  The page has its own --l-* tokens because it is a poster, not an app screen: it uses
+  whole fields of colour, which the app's "colour only means something" rule forbids.
+  Every class here starts with "l-", so nothing leaks into the app's screens.
+*/
+
+.l-page {
+  --l-margin: 32px;
+  --l-gutter: 24px;
+  /* The wall the hero and the footer stand on: it follows the theme like the rest. */
+  --l-wall: #ffffff;
+  --l-on-wall: #161816;
+  --l-on-wall-soft: #4b524e;
+  --l-paper: #eef1ee;
+  --l-ink: #161816;
+  --l-soft: #4b524e;
+  --l-field-1: #e0e7e3;
+  --l-field-2: #c6d6d0;
+  --l-accent: #1b6e66;
+  --l-on-accent: #eef1ee;
+
+  /* The three parts of the prompt, each with a mark and a pale wash for the slip. */
+  --l-known: #1b6e66;
+  --l-known-bg: #e3f1ee;
+  --l-notes: #b06a12;
+  --l-notes-bg: #fcf1df;
+  --l-told: #3d5f94;
+  --l-told-bg: #e6ecf6;
+
+  /* The espalier plate. */
+  --plate-paper: #eef1ee;
+  --plate-ink: #1d211f;
+  --plate-leaf: #b4d3cb;
+  --plate-fruit: #1b6e66;
+  --plate-wire: #a3aaa6;
+  --plate-post: #6d7470;
+
+  --display: var(--font-display);
+  --t-display: clamp(44px, 5.4vw, 84px);
+  --t-heading: clamp(34px, 3.7vw, 56px);
+  --t-title: clamp(26px, 2.2vw, 34px);
+  --t-lead: clamp(18px, 1.5vw, 22px);
+  --t-body: 17px;
+  --t-small: 14px;
+
+  background: var(--l-wall);
+  color: var(--l-ink);
+  font-size: var(--t-body);
+  line-height: 1.55;
+  overflow-x: clip;
+}
+
+:root[data-theme="dark"] .l-page {
+  --l-wall: #060707;
+  --l-on-wall: #eef1ee;
+  --l-on-wall-soft: #b2b9b5;
+  --l-paper: #101211;
+  --l-ink: #eef1ee;
+  --l-soft: #acb4af;
+  --l-field-1: #171b19;
+  --l-field-2: #1e2725;
+  --l-accent: #1f7a70;
+  --l-on-accent: #f2f4f2;
+
+  --l-known: #5cc0b3;
+  --l-known-bg: #16302c;
+  --l-notes: #e8b264;
+  --l-notes-bg: #33280f;
+  --l-told: #8fb0e0;
+  --l-told-bg: #1b2433;
+
+  --plate-paper: #181b19;
+  --plate-ink: #dde2df;
+  --plate-leaf: #34574f;
+  --plate-fruit: #5cc0b3;
+  --plate-wire: #4d5350;
+  --plate-post: #7d8480;
+}
+
+/* The content slides up over the footer like a sheet (see .l-footer). */
+.l-page main {
+  position: relative;
+  z-index: 2;
+}
+
+/* Headings: the serif, at its one weight; it is large enough to carry itself. */
+.l-h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: var(--t-heading);
+  line-height: 1.04;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.l-lead {
+  margin: 0;
+  color: var(--l-soft);
+  font-size: var(--t-lead);
+  line-height: 1.45;
+}
+
+/* Said where the server is needed and isn't there. */
+.l-sheet-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--t-small);
+}
+
+.l-button {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 8px;
+  background: var(--l-on-wall);
+  color: var(--l-wall);
+  font-size: var(--t-body);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+.l-button:hover { opacity: 0.86; }
+.l-button:active { transform: translateY(1px); }
+
+/* ------------------------------------------------------------ hero: the map on the wall */
+
+.l-hero {
+  padding: 0 var(--l-margin) 40px;
+  background: var(--l-wall);
+  color: var(--l-on-wall);
+}
+.l-hero :focus-visible { outline-color: var(--l-on-wall); }
+
+.l-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 72px;
+}
+.l-nav .brand { color: var(--l-on-wall); }
+
+.l-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+.l-nav-links a:not(.l-button) {
+  color: var(--l-on-wall);
+  text-decoration: none;
+  transition: opacity 150ms ease;
+}
+.l-nav-links a:not(.l-button):hover { opacity: 0.7; }
+.l-nav-links .icon-btn { margin: 0 -14px; color: var(--l-on-wall-soft); }
+.l-nav-links .icon-btn:hover { background: color-mix(in srgb, var(--l-on-wall) 10%, transparent); color: var(--l-on-wall); }
+
+.l-hero-head {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--l-gutter);
+  align-items: end;
+  padding: 20px 0 28px;
+}
+
+.l-hero-title {
+  grid-column: 1 / 8;
+  margin: 0;
+  font-family: var(--display);
+  font-size: var(--t-display);
+  line-height: 0.98;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.l-hero-side { grid-column: 8 / 13; }
+
+.l-hero-sub {
+  margin: 0;
+  color: var(--l-on-wall);
+  font-size: var(--t-lead);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.l-hero-facts {
+  margin: 10px 0 0;
+  color: var(--l-on-wall-soft);
+}
+
+.l-hero-caption {
+  margin: 14px 0 0;
+  color: var(--l-on-wall-soft);
+  font-size: var(--t-small);
+}
+
+/* A piece of the app, set into the wall. */
+.l-sheet {
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+.l-sheet :focus-visible { outline-color: var(--text); }
+
+/* Before the topics arrive: the space the map will take, so nothing below jumps. */
+.l-hero-sheet {
+  display: grid;
+  place-items: center;
+  min-height: 520px;
+}
+
+/* The map's sheet is the map screen's panel, in whichever theme the visitor is in. */
+.l-sheet {
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* The map screen's trellis, on the sheet. Its knots sit on the sheet's colour. */
+.l-trellis .topic { font-size: 14px; }
+
+/* The key: one line under the map, statuses first, then the two rings. */
+.l-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 24px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: var(--t-small);
+}
+.l-legend li { display: flex; align-items: center; gap: 8px; }
+.l-legend li:not(.l-legend-note) + .l-legend-note { margin-left: 16px; }
+.l-swatch-next,
+.l-swatch-needed {
+  width: 16px;
+  height: 12px;
+  border-radius: 4px;
+}
+.l-swatch-next { outline: 2px solid var(--accent); }
+.l-swatch-needed { outline: 2px dashed var(--muted); }
+
+/* Under the map: the topic being pointed at, and the subject switcher. */
+.l-readout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px 40px;
+  align-items: center;
+  margin-top: 20px;
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--raised);
+}
+
+.l-read-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: var(--t-lead);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.l-verdict {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: var(--t-small);
+  font-weight: 500;
+  line-height: 1.4;
+}
+.l-verdict[data-tone="next"] { background: var(--done-bg); color: var(--accent); }
+.l-verdict[data-tone="done"] { background: var(--done-bg); color: var(--done); }
+.l-verdict[data-tone="wait"] { background: var(--active); color: var(--muted); }
+
+.l-read-why {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: var(--t-small);
+  line-height: 1.45;
+  /* Two lines at most, so the hero doesn't change height as topics are picked. */
+  min-height: 2.9em;
+}
+
+.l-read-subject {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+}
+
+.l-seg {
+  display: inline-flex;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--active);
+}
+
+.l-seg-btn {
+  height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: var(--t-small);
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color 200ms ease, color 200ms ease, transform 150ms ease;
+}
+.l-seg-btn:hover { color: var(--text); }
+.l-seg-btn:active { transform: scale(0.98); }
+.l-seg-btn[aria-checked="true"] { background: var(--primary); color: var(--on-primary); }
+
+.l-read-count {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--t-small);
+}
+
+/* ------------------------------------------------------------ stuck: the trace, played by the scroll */
+
+.l-stuck {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--l-gutter);
+  align-items: center;
+  min-height: 100svh;
+  padding: 96px var(--l-margin);
+  background: var(--l-paper);
+}
+
+.l-stuck-text {
+  grid-column: 1 / 7;
+  padding-right: 56px;
+}
+.l-stuck-text p {
+  max-width: 28em;
+  margin: 24px 0 0;
+  font-size: var(--t-lead);
+  line-height: 1.45;
+}
+
+.l-stuck-art {
+  grid-column: 7 / 13;
+  display: grid;
+  gap: 20px;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--raised);
+  color: var(--text);
+}
+.l-stuck-art > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* What the student wrote, first, because the trace starts from it. */
+.l-said {
+  order: -1;
+  justify-self: start;
+  margin: 0;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: var(--stuck-bg);
+  color: var(--text);
+}
+
+/* The rule's own sentence for the one it names. */
+.l-reason {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--t-small);
+}
+
+.l-trace-line {
+  fill: none;
+  stroke: var(--stuck);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+}
+/* Once the verdict is in, the lines that led nowhere step back. */
+.l-trace-line[data-cleared] { opacity: 0.28; }
+
+.l-trace-box {
+  fill: var(--surface);
+  stroke: var(--control);
+  stroke-width: 1;
+}
+.l-trace-box[data-tone="stuck"] { fill: var(--stuck-bg); stroke: var(--stuck); stroke-width: 1.5; }
+.l-trace-box[data-tone="likely"] { fill: var(--learning-bg); stroke: var(--learning-mark); stroke-width: 2; }
+
+.l-trace-dot { fill: var(--todo-mark); }
+.l-trace-dot.status-DONE { fill: var(--done); }
+.l-trace-dot.status-LEARNING { fill: var(--learning-mark); }
+.l-trace-dot.status-STUCK { fill: var(--stuck); }
+
+.l-trace-name {
+  fill: var(--text);
+  font-family: var(--font);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.l-evidence {
+  fill: var(--muted);
+  font-family: var(--font);
+  font-size: 14px;
+}
+
+.l-verdict-tag { fill: var(--primary); }
+.l-verdict-text {
+  fill: var(--on-primary);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+
+/* The phone's version of the trace; hidden while the drawing fits. */
+.l-trace-list { display: none; }
+
+/* ------------------------------------------------------------ prompt: a slip, and where it came from */
+
+.l-prompt {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--l-gutter);
+  align-items: start;
+  padding: 144px var(--l-margin);
+  background: var(--l-field-1);
+}
+
+.l-prompt-text {
+  grid-column: 1 / 7;
+  padding-right: 56px;
+}
+.l-prompt-text .l-lead { margin-top: 20px; max-width: 28em; }
+
+.l-sources {
+  display: grid;
+  gap: 4px;
+  max-width: 520px;
+  margin: 32px 0 0 -16px;
+  padding: 0;
+  list-style: none;
+}
+
+.l-source {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--l-ink);
+  text-align: left;
+  transition: background-color 200ms ease;
+}
+.l-source:hover,
+.l-source[aria-pressed="true"] { background: var(--l-field-2); }
+
+.l-source-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--t-lead);
+  font-weight: 600;
+}
+/* Each source's swatch is the tint its part of the slip takes. */
+.l-source-name::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+.l-source[data-part="known"] .l-source-name::before { background: var(--l-known); }
+.l-source[data-part="experiences"] .l-source-name::before { background: var(--l-notes); }
+.l-source[data-part="instructions"] .l-source-name::before { background: var(--l-told); }
+
+.l-source-text {
+  padding-left: 22px;
+  color: var(--l-soft);
+}
+
+.l-prompt-ai {
+  max-width: 30em;
+  margin: 28px 0 0;
+  color: var(--l-soft);
+}
+.l-prompt-ai strong { color: var(--l-ink); font-weight: 600; }
+
+.l-slip {
+  grid-column: 7 / 13;
+  padding: 32px 36px 36px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--ground);
+  color: var(--text);
+  line-height: 1.5;
+}
+.l-slip p { margin: 0; }
+/* The prompt is plain text with "- " list lines; show it the way it will be pasted. */
+.l-slip ul { margin: 6px 0 0; padding-left: 16px; list-style: "-  "; }
+.l-slip li { margin-top: 4px; }
+
+.l-slip-head {
+  color: var(--muted);
+  font-size: var(--t-small);
+  font-weight: 600;
+}
+
+.l-slip [data-part] {
+  margin: 14px -14px 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  transition: background-color 250ms ease, opacity 250ms ease;
+}
+.l-slip[data-lit] [data-part] { opacity: 0.4; }
+.l-slip[data-lit="known"] [data-part="known"] { opacity: 1; background: var(--l-known-bg); }
+.l-slip[data-lit="experiences"] [data-part="experiences"] { opacity: 1; background: var(--l-notes-bg); }
+.l-slip[data-lit="instructions"] [data-part="instructions"] { opacity: 1; background: var(--l-told-bg); }
+
+.l-slip-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  margin-top: 24px;
+}
+.l-slip-copy {
+  height: 40px;
+  min-width: 152px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 600;
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+.l-slip-copy:hover { opacity: 0.88; }
+.l-slip-copy:active { transform: translateY(1px); }
+.l-slip-meta { color: var(--muted); font-size: var(--t-small); }
+
+/* ------------------------------------------------------------ subjects: every map at its real size */
+
+.l-subjects {
+  padding: 144px var(--l-margin);
+  background: var(--l-paper);
+}
+
+.l-subjects-head {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--l-gutter);
+  align-items: end;
+  margin-bottom: 48px;
+}
+.l-subjects-head .l-h2 { grid-column: 1 / 7; }
+.l-subjects-head .l-lead { grid-column: 8 / 13; }
+
+/* --cols comes from the number of subjects (Landing.jsx), so no subject sits alone. */
+.l-subject-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+  gap: var(--l-gutter);
+}
+
+.l-subject {
+  display: grid;
+  gap: 4px;
+  padding: 32px;
+  border-radius: 16px;
+  background: var(--l-field-1);
+  color: var(--l-ink);
+  text-decoration: none;
+  transition: background-color 200ms ease;
+}
+.l-subject:hover { background: var(--l-field-2); }
+
+.l-subject-map {
+  width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+}
+.l-mini-line { fill: none; stroke: var(--l-soft); stroke-width: 1.4; opacity: 0.5; }
+.l-mini-dot { fill: var(--l-ink); }
+.l-subject:hover .l-mini-dot { fill: var(--l-accent); }
+
+.l-subject-name {
+  font-family: var(--display);
+  font-size: var(--t-title);
+  line-height: 1.15;
+  font-weight: 400;
+}
+
+.l-subject-size { color: var(--l-soft); }
+
+/* ------------------------------------------------------------ what it won't do */
+
+/*
+  One grid for the whole section, so every part sits on a shared edge:
+    row 1  the heading, full width
+    row 2  the five promises (columns 1-8)   | the plate (columns 9-12), its top level
+    row 3  who it is for (columns 1-8)       | with the first promise
+*/
+.l-wont {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--l-gutter);
+  padding: 144px var(--l-margin);
+  background: var(--l-field-2);
+}
+
+/* The heading at the display size and the five words one step under it, so the heading
+   still reads as the title over them. */
+.l-wont .l-h2 {
+  grid-column: 1 / -1;
+  margin-bottom: 40px;
+  font-size: var(--t-display);
+  line-height: 1;
+}
+
+.l-wont-list {
+  grid-column: 1 / 9;
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* Word and sentence share a row, centred on each other. */
+.l-wont-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 5fr);
+  column-gap: var(--l-gutter);
+  align-items: center;
+  min-height: 104px;
+}
+
+.l-wont-word {
+  font-family: var(--display);
+  font-size: var(--t-heading);
+  line-height: 1;
+  font-style: italic;
+}
+
+.l-wont-fact {
+  font-size: var(--t-lead);
+  line-height: 1.4;
+}
+
+.l-wont-for {
+  grid-column: 1 / 9;
+  max-width: 44em;
+  margin: 32px 0 0;
+  color: var(--l-soft);
+}
+
+.l-plate {
+  grid-column: 9 / 13;
+  grid-row: 2 / span 2;
+  align-self: start;
+  display: grid;
+  gap: 14px;
+  margin: 0;
+}
+
+.l-plate-art {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: 16px;
+  background: var(--plate-paper);
+}
+
+.l-season {
+  position: absolute;
+  inset: 6% 4% 2%;
+}
+.l-season svg {
+  width: 100%;
+  height: 100%;
+}
+
+.l-plate figcaption {
+  color: var(--l-soft);
+  font-size: var(--t-small);
+}
+
+/* ------------------------------------------------------------ start: a card lying on the page */
+
+.l-start {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--l-gutter);
+  align-items: end;
+  padding: 120px var(--l-margin) 0;
+  background: var(--l-accent);
+  color: var(--l-on-accent);
+  overflow: hidden;
+}
+.l-start :focus-visible { outline-color: #161816; }
+
+.l-start-aside {
+  grid-column: 1 / 5;
+  margin: 0 0 72px;
+  font-size: var(--t-lead);
+  line-height: 1.45;
+}
+
+/* Turned two degrees and cut off by the section's edge: that is what makes it an object. */
+.l-start-card {
+  grid-column: 6 / 12;
+  display: grid;
+  gap: 12px;
+  margin-bottom: -40px;
+  padding: 48px 48px 88px;
+  border-radius: 16px;
+  background: #f6f7f5;
+  color: #161816;
+  text-align: center;
+  rotate: -2deg;
+}
+.l-start-card p { margin: 0; color: #3d433f; }
+
+.l-start-title {
+  margin: 0;
+  font-family: var(--display);
+  font-size: var(--t-heading);
+  line-height: 1.04;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+}
+
+.l-start-action {
+  display: grid;
+  place-items: center;
+  height: 56px;
+  margin-top: 16px;
+  border-radius: 8px;
+  background: #161816;
+  color: #f6f7f5;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+.l-start-action:hover { background: #1b6e66; }
+.l-start-action:active { transform: translateY(1px); }
+
+.l-start-second {
+  color: #3d433f;
+  font-size: var(--t-small);
+}
+
+/* ------------------------------------------------------------ footer: the name returns */
+
+/*
+  The footer sticks to the bottom of the screen underneath <main> (which has the higher
+  z-index), so the page's last section slides up and uncovers it. No script.
+*/
+.l-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  display: grid;
+  gap: 56px;
+  padding: 56px var(--l-margin) 20px;
+  background: var(--l-wall);
+  color: var(--l-on-wall);
+}
+.l-footer :focus-visible { outline-color: var(--l-on-wall); }
+
+.l-foot-cols {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--l-gutter);
+}
+/* Each column's heading leads it; the items are softer and one step smaller. */
+.l-foot-cols > div { display: grid; align-content: start; gap: 6px; }
+.l-foot-cols p { margin: 0; color: var(--l-on-wall-soft); font-size: var(--t-small); }
+.l-foot-cols a { color: var(--l-on-wall-soft); font-size: var(--t-small); text-decoration: none; }
+.l-foot-cols a:hover { color: var(--l-on-wall); }
+.l-foot-cols .l-foot-head { margin-bottom: 6px; color: var(--l-on-wall); font-size: var(--t-body); font-weight: 600; }
+
+.l-foot-bottom {
+  display: grid;
+  gap: 20px;
+}
+
+.l-foot-word {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.l-foot-word text {
+  fill: var(--l-on-wall);
+  /* The sans, not the serif: the serif's tall letters made the footer taller than the screen. */
+  font-family: var(--font);
+  font-size: 200px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.l-legal {
+  margin: 0;
+  color: var(--l-on-wall-soft);
+  font-size: var(--t-small);
+}
+
+/* ------------------------------------------------------------ narrower screens */
+
+@media (max-width: 1100px) {
+  .l-wont-list,
+  .l-wont-for { grid-column: 1 / 8; }
+  .l-plate { grid-column: 8 / 13; }
+}
+
+@media (max-width: 900px) {
+  .l-page { --l-margin: 16px; }
+
+  .l-nav-links { gap: 16px; }
+  .l-nav-links > a:not(.l-button):not([href="/login"]) { display: none; }
+
+  .l-hero-head { grid-template-columns: 1fr; row-gap: 16px; padding: 16px 0 24px; }
+  .l-hero-title,
+  .l-hero-side { grid-column: 1; }
+  .l-hero-sub { font-size: var(--t-body); }
+  .l-sheet { padding: 14px; }
+  .l-trellis .trellis-row { grid-template-columns: 1fr; row-gap: 8px; }
+  .l-trellis .trellis-row::before { display: none; }
+  .l-trellis .trellis-step { padding-top: 0; }
+  .l-trellis .trellis-step::before { top: 3px; }
+  /* Two topics a row, so the whole map fits in about one screen on a phone. */
+  .l-trellis .trellis-topics { display: grid; grid-template-columns: 1fr 1fr; }
+  .l-trellis .topic { width: 100%; min-width: 0; padding: 10px 12px; }
+  .l-legend .l-legend-note { display: none; }
+  .l-readout { grid-template-columns: 1fr; margin-top: 14px; }
+  .l-read-subject { justify-items: stretch; }
+  .l-seg { display: flex; width: 100%; }
+  .l-seg-btn { flex: 1; height: 44px; padding: 0 6px; white-space: normal; line-height: 1.2; }
+
+  /* No pin on a phone: the finished trace, under its three sentences. */
+  .l-stuck { grid-template-columns: 1fr; row-gap: 32px; min-height: 0; padding: 80px var(--l-margin); }
+  .l-stuck-text,
+  .l-stuck-art { grid-column: 1; }
+  .l-stuck-text,
+  .l-prompt-text { padding-right: 0; }
+  .l-stuck-text p { font-size: var(--t-body); margin-top: 16px; }
+  .l-stuck-art { padding: 14px; }
+  /* The drawing's text would be 6px tall here, so the same result is shown as a list. */
+  .l-stuck-art > svg,
+  .l-reason { display: none; }
+  .l-trace-list {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .l-trace-list li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 2px 10px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--surface);
+  }
+  .l-trace-list li[data-likely] { background: var(--learning-bg); }
+  .l-trace-list-name { font-weight: 600; }
+  .l-trace-list-note { grid-column: 2; color: var(--muted); font-size: var(--t-small); }
+
+  .l-prompt { grid-template-columns: 1fr; row-gap: 32px; padding: 80px var(--l-margin); }
+  .l-prompt-text,
+  .l-slip { grid-column: 1; }
+  .l-sources { margin: 20px 0 0; }
+  .l-source { padding-left: 0; padding-right: 0; }
+  .l-source:hover,
+  .l-source[aria-pressed="true"] { background: transparent; }
+  .l-slip { padding: 20px 18px 24px; }
+
+  .l-subjects { padding: 80px var(--l-margin); }
+  .l-subjects-head { grid-template-columns: 1fr; row-gap: 16px; margin-bottom: 32px; }
+  .l-subjects-head .l-h2,
+  .l-subjects-head .l-lead { grid-column: 1; }
+  .l-lead { font-size: var(--t-body); }
+  .l-subject-grid { grid-template-columns: 1fr; }
+  .l-subject { padding: 20px; }
+
+  .l-wont { grid-template-columns: 1fr; padding: 80px var(--l-margin); }
+  .l-wont .l-h2 { margin-bottom: 24px; }
+  .l-wont-list,
+  .l-wont-for,
+  .l-plate { grid-column: 1; grid-row: auto; }
+  .l-wont-list { gap: 20px; }
+  .l-wont-list li { grid-template-columns: 1fr; row-gap: 4px; min-height: 0; }
+  .l-wont-fact { font-size: var(--t-body); }
+  .l-plate { width: min(420px, 100%); justify-self: center; margin-top: 40px; }
+
+  .l-start { grid-template-columns: 1fr; padding-top: 72px; }
+  .l-start-aside,
+  .l-start-card { grid-column: 1; }
+  .l-start-aside { margin-bottom: 32px; font-size: var(--t-body); }
+  .l-start-card { padding: 32px 20px 72px; rotate: -1deg; }
+
+  .l-footer { gap: 40px; padding-top: 40px; }
+  .l-foot-cols { grid-template-columns: 1fr 1fr; row-gap: 32px; }
+}
