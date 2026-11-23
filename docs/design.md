@@ -512,10 +512,10 @@ and no internet. Run them with `npm test` (which is `vitest run`) inside `backen
 
 | Part | What is tested |
 |---|---|
-| 1 | `sortTopics` orders topics, gives the right levels, and catches a loop; the error handler sends the right status and shape |
+| 1 | `sortTopics` orders topics, gives the right levels, and catches a loop; the error handler sends the right status and shape; `seedGraph.test.js` verifies topic graph validity, acyclicity, and repeatable seeding across all subjects (JS, Node.js, MongoDB, React) |
 | 2 | hash then check a password; sign then check a token; `requireAuth` (no token, bad token, good token); `requireAdmin` (student gets 403, admin passes) |
 | 3 | `checkRefreshToken` refuses used and expired tokens; `findOrCreateGoogleUser` with a fake database: existing Google user, existing email, new user |
-| 4 | `findNextTopic`, `findStuckHint` and `buildPrompt` on small made-up topic lists; `improvePrompt` with a faked `fetch`: success, error and timeout |
+| 4 | `findNextTopic`, `findStuckHint` and `buildPrompt` across topics; `improvePrompt` with a faked `fetch`: success, error and timeout |
 
 How code is written so it can be tested:
 
@@ -550,8 +550,9 @@ person's commits show on GitHub under their name.
   shared Prisma client and `HttpError` (`lib/`), the error handler and `validateBody`
   (`middleware/`).
 - **The topic models:** `Subject`, `Topic` and `TopicPrerequisite` in `schema.prisma`.
-- **The seed:** `prisma/seed.js` loads JavaScript fundamentals: 15 topics and their
-  "needs" links.
+- **The seed:** `prisma/seed.js` loads JavaScript fundamentals (15 topics), Node.js
+  fundamentals (12 topics), MongoDB fundamentals (12 topics), and React fundamentals
+  (16 topics) and their "needs" links repeatably without deleting user progress.
 - **`sortTopics`:** puts topics in learning order with a level each, and refuses a loop
   with 400.
 - **The topic routes:** `GET /api/subjects`, `GET /api/subjects/:id/topics`, and the admin
