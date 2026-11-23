@@ -6,6 +6,7 @@ import { findNextTopic } from "./findNextTopic.js";
 import { findStuckHint } from "./findStuckHint.js";
 import { buildPrompt } from "./buildPrompt.js";
 import { improvePrompt } from "./improvePrompt.js";
+import { summarizeNotes } from "./summarizeNotes.js";
 
 export const updateProgressSchema = z.object({
   status: z.enum(["NOT_STARTED", "LEARNING", "DONE", "STUCK"]),
@@ -145,7 +146,7 @@ async function loadPromptContext(userId, topicId) {
   const statusById = Object.fromEntries(
     progressRows.map((p) => [p.topicId, p.status])
   );
-  const noteById = Object.fromEntries(progressRows.filter((p) => p.note).map((p) => [p.topicId, p.note]));
+  const savedNotes = Object.fromEntries(progressRows.filter((p) => p.note).map((p) => [p.topicId, p.note]));
   const topicStatus = statusById[topic.id] ?? "NOT_STARTED";
 
   let hint = null;
@@ -155,6 +156,9 @@ async function loadPromptContext(userId, topicId) {
     hint = findStuckHint(topicForHint, topicsById, statusById);
   }
 
+  const noteIds = [topic.id, ...prereqs.filter((p) => statusById[p.id] === "DONE" && savedNotes[p.id]).slice(0, 2).map((p) => p.id)];
+  const relevantNotes = Object.fromEntries(noteIds.filter((id) => savedNotes[id]).map((id) => [id, savedNotes[id]]));
+  const noteById = await summarizeNotes(relevantNotes);
   const template = buildPrompt({
     subjectName: topic.subject.name,
     topic,

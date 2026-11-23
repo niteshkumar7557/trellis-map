@@ -37,7 +37,7 @@ export function PromptSlip({ stuck }) {
         </h2>
         <p className="l-lead" data-rise>
           It never explains {stuck?.topic.name ?? "a topic"}. It puts together what your AI needs to know about you, from
-          three places, and no model writes a word of it.
+          three places. For signed-in students, Groq briefly summarizes saved notes before they go into the prompt.
         </p>
         <ul className="l-sources">
           {SOURCES.map((s) => (
