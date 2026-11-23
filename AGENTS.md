@@ -89,8 +89,11 @@ subject selection in the frontend map and admin views. All 13 test files passed 
 **Landing page (23 Nov 2026), branch `feat/landing-page`:** a public front page at `/` for
 signed-out visitors (signed in, `/` stays the map): a live hero map, the stuck trace, the
 prompt in three parts, the subjects, "What it won't do" and a start card. Frontend only;
-adds `gsap` and `@gsap/react`. `docs/design.md` §16 has everything, including the
-three-part prompt the backend's `buildPrompt` will move to.
+adds `gsap` and `@gsap/react`. `docs/design.md` §16 describes the three-part prompt.
+
+**Prompt notes (23 Nov 2026), branch `fix/layered-study-prompt`:** the signed-in prompt now
+uses the three-part structure. Groq summarizes the current note and up to two completed
+prerequisite notes, with the original notes as fallback. See `docs/design.md` §8 and §16.
 
 **Next:** the viva deadline has been extended, so the team will add new features. Add each
 feature to `docs/design.md` (what it does, its routes and fields, who owns it) before

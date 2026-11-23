@@ -40,7 +40,7 @@ const sentence = (s) => (/[.!?]$/.test(s) ? s : `${s}.`);
  * @param statusById   { [topicId]: "DONE" | "LEARNING" | "STUCK" | "NOT_STARTED" }
  * @param noteById     { [topicId]: string }
  * @param hint         findStuckHint's answer, or null
- * @returns { known, experiences: [string], instructions: [string], text }
+ * @returns {string} the assembled prompt
  */
 export function buildPrompt({ subjectName, topic, prereqs = [], statusById = {}, noteById = {}, hint = null }) {
   const statusOf = (id) => statusById[id] ?? "NOT_STARTED";

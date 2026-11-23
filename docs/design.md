@@ -28,7 +28,7 @@ Trellis knows which topic **needs** which, so it can:
 
 **The one rule: Trellis never teaches.** Explanations are free everywhere. Trellis does the
 part a chat AI can't: it knows the shape of the subject and where you are in it. Even the
-AI feature only rewrites the prompt; it never explains the topic.
+AI feature summarizes saved notes and can rewrite the prompt; it never explains the topic.
 
 ## 2. What's in, what's out
 
@@ -45,7 +45,7 @@ AI feature only rewrites the prompt; it never explains the topic.
 6. A status on each topic: Not started, Learning, Done, Stuck. Plus a short note.
 7. The next topic.
 8. The stuck hint.
-9. The prompt, built from a template, with a Copy button.
+9. The prompt, built from a template and AI summaries of saved notes when available, with a Copy button.
 10. "Improve with AI": one Groq call that rewrites the prompt; falls back to the template if
     the AI fails.
 11. An admin role: admins can add and edit topics. Students can't.
@@ -357,28 +357,7 @@ looks weak. Try the prompt with a different way in."
 It's always "**may be** because of": a guess, never a verdict. It's a fixed rule, not the
 AI's opinion, so we can always explain why it said what it said.
 
-**The prompt** (`buildPrompt`) is a template, filled in from the data:
-
-```
-I'm learning JavaScript fundamentals. The topic is Promises: <summary>.
-I'm comfortable with: Functions, Callbacks.
-I'm not solid on yet: Scope and hoisting.
-My note: <the student's note, if any>.
-Common mistakes to watch for: <the topic's mistakes>.
-<status line>
-Teach me in small steps and ask me one question after each step. Don't lecture.
-When we finish, give me two lines: what I understood, and what is still unclear.
-```
-
-The status line depends on where the student is:
-
-| Status | Status line |
-|---|---|
-| Stuck | "I'm stuck on this. Start with what I may be missing: Callbacks." |
-| Done | "I think I know this. Quiz me first and only teach what I get wrong." |
-| Anything else | (no line) |
-
-A line with nothing to say (no note, no prerequisites) is left out.
+**The prompt** (`buildPrompt`) uses the three-part structure in §16. The controller loads the current topic and its prerequisites, statuses, and notes. `summarizeNotes` sends the current note and up to two notes from completed prerequisites to Groq in one request, then caches summaries by note text. If the key is missing, Groq fails, or the response is invalid, the original notes are used. `buildPrompt` combines these notes with map context and fixed instructions. It does not call AI itself.
 
 **Improve with AI** (`improvePrompt`): send the template prompt to Groq.
 
@@ -677,7 +656,7 @@ it, worked out live on a sample student.
     `backend/src/progress/`, through the Vite alias `@rules`.
   - If a rule changes, the landing page changes with it.
 - **The prompt:** `buildLayeredPrompt` in `frontend/src/landing/layeredPrompt.js`. It uses
-  the three-part structure prompts are moving to (see "The three-part prompt" below).
+  the three-part structure also used by the backend (see "The three-part prompt" below).
 - **If the API isn't reachable:** the live sections say so in one line. The rest of the
   page still shows.
 
@@ -720,8 +699,7 @@ Also new is `frontend/src/lib/gsap.js`, which registers the plugins once. In `Ap
 counts as signed out, so the landing page still shows. `MapPage.jsx` exports its
 `TopicNode`, so the hero draws the same boxes as the map.
 
-**The three-part prompt.** The landing page shows a sample; the backend's `buildPrompt` now uses the same structure for signed-in students. The prompt is
-assembled, never generated, in three parts:
+**The three-part prompt.** The landing page shows a sample; the backend's `buildPrompt` uses the same structure for signed-in students. Groq summarizes relevant saved notes before the backend assembles the prompt. The rest is fixed text and map data. If Groq is unavailable, the original notes are used. The parts are:
 
 1. **Known:** what the map says.
    - The topic's status, as a sentence: "I'm learning JavaScript fundamentals and I'm
@@ -729,8 +707,7 @@ assembled, never generated, in three parts:
    - Each topic it needs, grouped: "I'm comfortable with…" (Done), "I'm shaky on…"
      (Learning or Stuck), "I haven't studied… yet" (Not started).
    - When stuck, the hint's topic is named as "my real gap".
-2. **From my own notes:** this topic's note, plus the notes of up to two topics it needs
-   that are Done (what worked there).
+2. **From my own notes:** a brief Groq summary of this topic's note, plus summaries of the notes of up to two topics it needs that are Done. Summaries are cached by note text; changed notes get a new summary.
 3. **How I'd like you to help:** fixed lines, in this order:
    - one or two lines for the topic's status (Stuck: start with the gap, then explain it a
      different way; Done: quiz me first; Learning: pick up where I stopped; Not started:
