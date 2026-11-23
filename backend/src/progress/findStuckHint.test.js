@@ -84,5 +84,45 @@ describe("findStuckHint", () => {
       expect(findStuckHint(topic, reactTopicsById, statusById)).toBeNull();
     });
   });
+
+  describe("with Node.js fundamentals topics", () => {
+    const nodeTopicsById = {
+      4: { id: 4, name: "Buffers and binary data", needs: [1] },
+      6: { id: 6, name: "EventEmitter and event-driven architecture", needs: [2] },
+      8: { id: 8, name: "File system with promises", needs: [5] },
+      9: { id: 9, name: "Streams and piping", needs: [6, 4] },
+      10: { id: 10, name: "HTTP server fundamentals", needs: [9, 8] },
+    };
+
+    it("hints unstarted prerequisite streams when stuck on http-server", () => {
+      const topic = nodeTopicsById[10]; // needs streams (9) and fs-promises (8)
+      const statusById = { 8: "LEARNING", 9: "NOT_STARTED" };
+      const hint = findStuckHint(topic, nodeTopicsById, statusById);
+
+      expect(hint).toEqual({
+        topicId: 9,
+        name: "Streams and piping",
+        reason: "You haven't started Streams and piping yet, and HTTP server fundamentals needs it.",
+      });
+    });
+
+    it("hints stuck prerequisite buffers when stuck on streams", () => {
+      const topic = nodeTopicsById[9]; // needs events (6) and buffers (4)
+      const statusById = { 6: "DONE", 4: "STUCK" };
+      const hint = findStuckHint(topic, nodeTopicsById, statusById);
+
+      expect(hint).toEqual({
+        topicId: 4,
+        name: "Buffers and binary data",
+        reason: "You're stuck on Buffers and binary data too, and Streams and piping builds on it.",
+      });
+    });
+
+    it("returns null when all Node.js prerequisites are DONE", () => {
+      const topic = nodeTopicsById[10];
+      const statusById = { 8: "DONE", 9: "DONE" };
+      expect(findStuckHint(topic, nodeTopicsById, statusById)).toBeNull();
+    });
+  });
 });
 

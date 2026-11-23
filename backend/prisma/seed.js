@@ -159,6 +159,135 @@ export const JAVASCRIPT_TOPICS = [
   },
 ];
 
+export const NODEJS_SUBJECT = {
+  slug: "nodejs",
+  name: "Node.js fundamentals",
+  description: "Server-side JavaScript runtime, core modules, asynchronous I/O, and HTTP servers",
+};
+
+export const NODEJS_TOPICS = [
+  {
+    slug: "node-runtime",
+    name: "Node.js runtime and CLI",
+    summary: "The V8 engine, running scripts from the CLI, REPL, and node flags",
+    mistakes: [
+      "Expecting browser APIs like window or document to exist",
+      "running scripts without node installed in PATH",
+    ],
+    needs: [],
+  },
+  {
+    slug: "modules",
+    name: "CommonJS and ES modules",
+    summary: "require/module.exports vs import/export, package.json type field, and file extensions",
+    mistakes: [
+      "Mixing require and import in the same file without proper config",
+      "forgetting file extensions in relative ESM imports",
+    ],
+    needs: ["node-runtime"],
+  },
+  {
+    slug: "process-env",
+    name: "Process and environment variables",
+    summary: "process.env, process.argv, exit codes, and process lifecycle events",
+    mistakes: [
+      "Hardcoding secrets instead of reading process.env",
+      "treating process.env values as numbers or booleans instead of strings",
+    ],
+    needs: ["node-runtime"],
+  },
+  {
+    slug: "buffers",
+    name: "Buffers and binary data",
+    summary: "Buffer.from, Buffer.alloc, string encodings (utf-8, base64), and raw byte handling",
+    mistakes: [
+      "Assuming buffers resize automatically like arrays",
+      "forgetting to specify encoding when converting buffers to strings",
+    ],
+    needs: ["node-runtime"],
+  },
+  {
+    slug: "path-url",
+    name: "Path and URL utilities",
+    summary: "path.join, path.resolve, __dirname, fileURLToPath, and the URL class",
+    mistakes: [
+      "Concatenating paths with string slashes instead of path.join",
+      "using __dirname directly in ES modules without import.meta.url",
+    ],
+    needs: ["modules"],
+  },
+  {
+    slug: "events",
+    name: "EventEmitter and event-driven architecture",
+    summary: "Creating event emitters, emitting events, listening with on and once, and error events",
+    mistakes: [
+      "Emitting an error event without an error listener causing an uncaught exception",
+      "adding duplicate listeners inside loops causing memory leaks",
+    ],
+    needs: ["modules"],
+  },
+  {
+    slug: "npm-packages",
+    name: "NPM and package management",
+    summary: "package.json, npm install, dependencies vs devDependencies, and semantic versioning",
+    mistakes: [
+      "Committing node_modules to version control",
+      "relying on globally installed packages instead of local dependencies",
+    ],
+    needs: ["modules"],
+  },
+  {
+    slug: "fs-promises",
+    name: "File system with promises",
+    summary: "fs/promises for reading, writing, appending files, and handling file errors",
+    mistakes: [
+      "Using synchronous fs methods in request handlers",
+      "not awaiting fs/promises calls leading to unhandled rejections",
+    ],
+    needs: ["path-url"],
+  },
+  {
+    slug: "streams",
+    name: "Streams and piping",
+    summary: "Readable, Writable, pipeline, and streaming data without loading entire files into memory",
+    mistakes: [
+      "Using pipe instead of pipeline which leaks file descriptors on error",
+      "forgetting to handle error events on individual streams",
+    ],
+    needs: ["events", "buffers"],
+  },
+  {
+    slug: "http-server",
+    name: "HTTP server fundamentals",
+    summary: "http.createServer, req and res streams, status codes, headers, and basic routing",
+    mistakes: [
+      "Forgetting res.end() causing client requests to hang",
+      "writing headers after the response body has started streaming",
+    ],
+    needs: ["streams", "fs-promises"],
+  },
+  {
+    slug: "express-basics",
+    name: "Express basics and routing",
+    summary: "App setup, route handlers (get, post), route parameters, and query strings",
+    mistakes: [
+      "Defining routes in the wrong order so specific paths are caught by wildcards",
+      "forgetting req.params values are strings",
+    ],
+    needs: ["http-server", "npm-packages"],
+  },
+  {
+    slug: "middleware",
+    name: "Middleware and error handling",
+    summary: "Application, router, and built-in middleware, next(), and 4-argument error handlers",
+    mistakes: [
+      "Forgetting to call next() in custom middleware causing requests to stall",
+      "omitting any of the 4 arguments in Express error middleware",
+    ],
+    needs: ["express-basics"],
+  },
+];
+
 export const MONGODB_SUBJECT = {
   slug: "mongodb",
   name: "MongoDB fundamentals",
@@ -532,6 +661,7 @@ export async function seedSubject(db, subjectData, topics) {
 
 export const DEFAULT_SUBJECTS = [
   { subject: JAVASCRIPT_SUBJECT, topics: JAVASCRIPT_TOPICS },
+  { subject: NODEJS_SUBJECT, topics: NODEJS_TOPICS },
   { subject: MONGODB_SUBJECT, topics: MONGODB_TOPICS },
   { subject: REACT_SUBJECT, topics: REACT_TOPICS },
 ];

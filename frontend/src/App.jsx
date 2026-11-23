@@ -48,6 +48,12 @@ export default function App() {
   function handleSelectSubject(id) {
     setSelectedSubjectId(id);
     localStorage.setItem("trellis-subject-id", String(id));
+    const target = subjects.find((s) => s.id === id);
+    if (target) {
+      const url = new URL(window.location);
+      url.searchParams.set("subject", target.slug);
+      window.history.replaceState({}, "", url);
+    }
   }
 
   if (user === undefined) return <p className="center muted">Loading…</p>;
@@ -85,7 +91,7 @@ export default function App() {
       <Route path="/" element={signedIn(<MapPage user={user} selectedSubjectId={selectedSubjectId} />)} />
       <Route
         path="/admin"
-        element={signedIn(user?.role === "ADMIN" ? <AdminPage /> : <Navigate to="/" />)}
+        element={signedIn(user?.role === "ADMIN" ? <AdminPage initialSubjectId={selectedSubjectId} /> : <Navigate to="/" />)}
       />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>

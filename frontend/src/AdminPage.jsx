@@ -5,7 +5,7 @@ const EMPTY = { name: "", summary: "", mistakes: "", needs: [] };
 
 // Admins add and edit topics. The server checks the role too (403 for a student);
 // hiding the link is only so students don't see a screen they can't use.
-export default function AdminPage() {
+export default function AdminPage({ initialSubjectId }) {
   const [subjects, setSubjects] = useState([]);
   const [subject, setSubject] = useState(null);
   const [topics, setTopics] = useState([]);
@@ -18,7 +18,7 @@ export default function AdminPage() {
   async function loadTopics(subjectIdToLoad) {
     const { subjects: list } = await apiFetch("/api/subjects");
     setSubjects(list);
-    const targetId = subjectIdToLoad ?? subject?.id ?? list[0]?.id;
+    const targetId = subjectIdToLoad ?? initialSubjectId ?? subject?.id ?? list[0]?.id;
     if (!targetId) return;
     const data = await apiFetch(`/api/subjects/${targetId}/topics`);
     setSubject(data.subject);

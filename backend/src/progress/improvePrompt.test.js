@@ -106,4 +106,31 @@ describe("improvePrompt", () => {
     expect(result.improved).toBe(true);
     expect(result.prompt).toContain("React fundamentals");
   });
+
+  it("improves a prompt built from Node.js fundamentals data", async () => {
+    const nodeTemplate =
+      "I'm learning Node.js fundamentals. The topic is HTTP server fundamentals. I'm stuck on this. Start with what I may be missing: Streams and piping.";
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          choices: [
+            {
+              message: {
+                content:
+                  "I'm studying Node.js fundamentals focusing on HTTP server fundamentals. Teach me in small interactive steps starting with Streams and piping.",
+              },
+            },
+          ],
+        }),
+      })
+    );
+
+    const result = await improvePrompt(nodeTemplate);
+    expect(result.improved).toBe(true);
+    expect(result.prompt).toContain("Node.js fundamentals");
+  });
 });

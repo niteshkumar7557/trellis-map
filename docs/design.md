@@ -37,9 +37,9 @@ AI feature only rewrites the prompt; it never explains the topic.
 1. Sign up and log in with email and password, or with Google.
 2. A short-lived access token plus a refresh token in a cookie; logout really ends the
    session.
-3. Three subjects, **JavaScript fundamentals** (15 topics), **MongoDB fundamentals** (12
-   topics), and **React fundamentals** (16 topics), with "needs" links between them, loaded by a
-   seed script.
+3. Four subjects, **JavaScript fundamentals** (15 topics), **Node.js fundamentals** (12
+   topics), **MongoDB fundamentals** (12 topics), and **React fundamentals** (16 topics), with
+   "needs" links between them, loaded by a repeatable seed script.
 4. Subject switcher allowing students and admins to choose between subjects.
 5. Topics shown in learning order (grouped by level).
 6. A status on each topic: Not started, Learning, Done, Stuck. Plus a short note.
@@ -53,7 +53,7 @@ AI feature only rewrites the prompt; it never explains the topic.
 13. Unit tests (Vitest) for every part.
 
 **Out (on purpose):** a chat, quizzes, explanations, third-party subjects beyond JS,
-MongoDB, and React, topics inside topics, password reset, email, deleting your account, deployment. The
+Node.js, MongoDB, and React, topics inside topics, password reset, email, deleting your account, deployment. The
 app runs on our laptops for the demo.
 
 ## 3. Tech stack and why
@@ -425,6 +425,25 @@ mistakes.
 | 14 | `promises` | Promises | callbacks, errors |
 | 15 | `async-await` | async and await | promises |
 
+## 9b. The subject: Node.js fundamentals
+
+Seeded by `prisma/seed.js`, which holds each topic's summary, common mistakes, and prerequisites.
+
+| # | slug | Topic | Needs | Summary | Common mistakes |
+|---|---|---|---|---|---|
+| 1 | `node-runtime` | Node.js runtime and CLI | none | The V8 engine, running scripts from the CLI, REPL, and node flags | Expecting browser APIs like window or document to exist; running scripts without node installed in PATH |
+| 2 | `modules` | CommonJS and ES modules | node-runtime | require/module.exports vs import/export, package.json type field, and file extensions | Mixing require and import in the same file without proper config; forgetting file extensions in relative ESM imports |
+| 3 | `process-env` | Process and environment variables | node-runtime | process.env, process.argv, exit codes, and process lifecycle events | Hardcoding secrets instead of reading process.env; treating process.env values as numbers or booleans instead of strings |
+| 4 | `buffers` | Buffers and binary data | node-runtime | Buffer.from, Buffer.alloc, string encodings (utf-8, base64), and raw byte handling | Assuming buffers resize automatically like arrays; forgetting to specify encoding when converting buffers to strings |
+| 5 | `path-url` | Path and URL utilities | modules | path.join, path.resolve, __dirname, fileURLToPath, and the URL class | Concatenating paths with string slashes instead of path.join; using __dirname directly in ES modules without import.meta.url |
+| 6 | `events` | EventEmitter and event-driven architecture | modules | Creating event emitters, emitting events, listening with on and once, and error events | Emitting an error event without an error listener causing an uncaught exception; adding duplicate listeners inside loops causing memory leaks |
+| 7 | `npm-packages` | NPM and package management | modules | package.json, npm install, dependencies vs devDependencies, and semantic versioning | Committing node_modules to version control; relying on globally installed packages instead of local dependencies |
+| 8 | `fs-promises` | File system with promises | path-url | fs/promises for reading, writing, appending files, and handling file errors | Using synchronous fs methods in request handlers; not awaiting fs/promises calls leading to unhandled rejections |
+| 9 | `streams` | Streams and piping | events, buffers | Readable, Writable, pipeline, and streaming data without loading entire files into memory | Using pipe instead of pipeline which leaks file descriptors on error; forgetting to handle error events on individual streams |
+| 10 | `http-server` | HTTP server fundamentals | streams, fs-promises | http.createServer, req and res streams, status codes, headers, and basic routing | Forgetting res.end() causing client requests to hang; writing headers after the response body has started streaming |
+| 11 | `express-basics` | Express basics and routing | http-server, npm-packages | App setup, route handlers (get, post), route parameters, and query strings | Defining routes in the wrong order so specific paths are caught by wildcards; forgetting req.params values are strings |
+| 12 | `middleware` | Middleware and error handling | express-basics | Application, router, and built-in middleware, next(), and 4-argument error handlers | Forgetting to call next() in custom middleware causing requests to stall; omitting any of the 4 arguments in Express error middleware |
+
 ### 9.2 MongoDB fundamentals
 
 | # | slug | Topic | Needs | Summary | Common mistakes |
@@ -493,10 +512,10 @@ and no internet. Run them with `npm test` (which is `vitest run`) inside `backen
 
 | Part | What is tested |
 |---|---|
-| 1 | `sortTopics` orders topics, gives the right levels, and catches a loop; the error handler sends the right status and shape |
+| 1 | `sortTopics` orders topics, gives the right levels, and catches a loop; the error handler sends the right status and shape; `seedGraph.test.js` verifies topic graph validity, acyclicity, and repeatable seeding across all subjects (JS, Node.js, MongoDB, React) |
 | 2 | hash then check a password; sign then check a token; `requireAuth` (no token, bad token, good token); `requireAdmin` (student gets 403, admin passes) |
 | 3 | `checkRefreshToken` refuses used and expired tokens; `findOrCreateGoogleUser` with a fake database: existing Google user, existing email, new user |
-| 4 | `findNextTopic`, `findStuckHint` and `buildPrompt` on small made-up topic lists; `improvePrompt` with a faked `fetch`: success, error and timeout |
+| 4 | `findNextTopic`, `findStuckHint` and `buildPrompt` across topics; `improvePrompt` with a faked `fetch`: success, error and timeout |
 
 How code is written so it can be tested:
 
@@ -531,8 +550,9 @@ person's commits show on GitHub under their name.
   shared Prisma client and `HttpError` (`lib/`), the error handler and `validateBody`
   (`middleware/`).
 - **The topic models:** `Subject`, `Topic` and `TopicPrerequisite` in `schema.prisma`.
-- **The seed:** `prisma/seed.js` loads JavaScript fundamentals: 15 topics and their
-  "needs" links.
+- **The seed:** `prisma/seed.js` loads JavaScript fundamentals (15 topics), Node.js
+  fundamentals (12 topics), MongoDB fundamentals (12 topics), and React fundamentals
+  (16 topics) and their "needs" links repeatably without deleting user progress.
 - **`sortTopics`:** puts topics in learning order with a level each, and refuses a loop
   with 400.
 - **The topic routes:** `GET /api/subjects`, `GET /api/subjects/:id/topics`, and the admin

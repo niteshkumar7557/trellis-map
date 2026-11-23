@@ -139,5 +139,64 @@ describe("buildPrompt", () => {
     expect(prompt).toContain("I'm learning React fundamentals. The topic is JSX and React elements");
     expect(prompt).toContain("I think I know this. Quiz me first and only teach what I get wrong.");
   });
+
+  it("builds a complete prompt for a Node.js fundamentals topic with prerequisites and mistakes", () => {
+    const nodeTopic = {
+      id: 10,
+      slug: "http-server",
+      name: "HTTP server fundamentals",
+      summary: "http.createServer, req and res streams, status codes, headers, and basic routing",
+      mistakes: [
+        "Forgetting res.end() causing client requests to hang",
+        "writing headers after the response body has started streaming",
+      ],
+    };
+
+    const prereqs = [
+      { id: 9, name: "Streams and piping" },
+      { id: 8, name: "File system with promises" },
+    ];
+
+    const prompt = buildPrompt({
+      subjectName: "Node.js fundamentals",
+      topic: nodeTopic,
+      prereqs,
+      statusById: { 10: "STUCK", 9: "DONE", 8: "NOT_STARTED" },
+      note: "Need help handling streaming request bodies",
+      hint: { topicId: 8, name: "File system with promises" },
+    });
+
+    expect(prompt).toContain(
+      "I'm learning Node.js fundamentals. The topic is HTTP server fundamentals: http.createServer, req and res streams, status codes, headers, and basic routing."
+    );
+    expect(prompt).toContain("I'm comfortable with: Streams and piping.");
+    expect(prompt).toContain("I'm not solid on yet: File system with promises.");
+    expect(prompt).toContain("My note: Need help handling streaming request bodies.");
+    expect(prompt).toContain(
+      "Common mistakes to watch for: Forgetting res.end() causing client requests to hang, writing headers after the response body has started streaming."
+    );
+    expect(prompt).toContain(
+      "I'm stuck on this. Start with what I may be missing: File system with promises."
+    );
+    expect(prompt).toContain("Teach me in small steps and ask me one question after each step. Don't lecture.");
+  });
+
+  it("builds a prompt for a completed Node.js topic with quiz instruction", () => {
+    const nodeTopic = {
+      id: 1,
+      name: "Node.js runtime and CLI",
+      summary: "The V8 engine, running scripts from the CLI, REPL, and node flags",
+      mistakes: ["Expecting browser APIs like window or document to exist"],
+    };
+
+    const prompt = buildPrompt({
+      subjectName: "Node.js fundamentals",
+      topic: nodeTopic,
+      statusById: { 1: "DONE" },
+    });
+
+    expect(prompt).toContain("I'm learning Node.js fundamentals. The topic is Node.js runtime and CLI");
+    expect(prompt).toContain("I think I know this. Quiz me first and only teach what I get wrong.");
+  });
 });
 
