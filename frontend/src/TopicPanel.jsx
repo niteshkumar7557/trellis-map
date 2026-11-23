@@ -84,7 +84,10 @@ export default function TopicPanel({ topic, subject, topicsById, status, note, o
       data-subject={subject?.slug}
     >
       <div className="topic-panel-head">
-        <h2 id="panel-title">{topic.name}</h2>
+        <div>
+          {subject?.name && <span className="topic-panel-subject muted">{subject.name}</span>}
+          <h2 id="panel-title">{topic.name}</h2>
+        </div>
         <button className="icon-btn" onClick={onClose} aria-label="Close the topic">
           <CloseIcon />
         </button>

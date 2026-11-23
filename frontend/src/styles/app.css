@@ -548,6 +548,12 @@
   letter-spacing: -0.01em;
 }
 
+.topic-panel-subject {
+  display: block;
+  font-size: var(--fs-small);
+  margin-bottom: 2px;
+}
+
 .topic-panel-head .icon-btn {
   flex: none;
   margin: -2px -8px 0 0;
