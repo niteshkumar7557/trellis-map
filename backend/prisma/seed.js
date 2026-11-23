@@ -226,6 +226,66 @@ export const NODEJS_TOPICS = [
     ],
     needs: ["modules"],
   },
+  {
+    slug: "npm-packages",
+    name: "NPM and package management",
+    summary: "package.json, npm install, dependencies vs devDependencies, and semantic versioning",
+    mistakes: [
+      "Committing node_modules to version control",
+      "relying on globally installed packages instead of local dependencies",
+    ],
+    needs: ["modules"],
+  },
+  {
+    slug: "fs-promises",
+    name: "File system with promises",
+    summary: "fs/promises for reading, writing, appending files, and handling file errors",
+    mistakes: [
+      "Using synchronous fs methods in request handlers",
+      "not awaiting fs/promises calls leading to unhandled rejections",
+    ],
+    needs: ["path-url"],
+  },
+  {
+    slug: "streams",
+    name: "Streams and piping",
+    summary: "Readable, Writable, pipeline, and streaming data without loading entire files into memory",
+    mistakes: [
+      "Using pipe instead of pipeline which leaks file descriptors on error",
+      "forgetting to handle error events on individual streams",
+    ],
+    needs: ["events", "buffers"],
+  },
+  {
+    slug: "http-server",
+    name: "HTTP server fundamentals",
+    summary: "http.createServer, req and res streams, status codes, headers, and basic routing",
+    mistakes: [
+      "Forgetting res.end() causing client requests to hang",
+      "writing headers after the response body has started streaming",
+    ],
+    needs: ["streams", "fs-promises"],
+  },
+  {
+    slug: "express-basics",
+    name: "Express basics and routing",
+    summary: "App setup, route handlers (get, post), route parameters, and query strings",
+    mistakes: [
+      "Defining routes in the wrong order so specific paths are caught by wildcards",
+      "forgetting req.params values are strings",
+    ],
+    needs: ["http-server", "npm-packages"],
+  },
+  {
+    slug: "middleware",
+    name: "Middleware and error handling",
+    summary: "Application, router, and built-in middleware, next(), and 4-argument error handlers",
+    mistakes: [
+      "Forgetting to call next() in custom middleware causing requests to stall",
+      "omitting any of the 4 arguments in Express error middleware",
+    ],
+    needs: ["express-basics"],
+  },
 ];
 
 export const MONGODB_SUBJECT = {
