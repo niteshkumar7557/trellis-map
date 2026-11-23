@@ -720,8 +720,7 @@ Also new is `frontend/src/lib/gsap.js`, which registers the plugins once. In `Ap
 counts as signed out, so the landing page still shows. `MapPage.jsx` exports its
 `TopicNode`, so the hero draws the same boxes as the map.
 
-**The three-part prompt (planned for the backend).** The landing page already shows it; the
-backend's `buildPrompt` will move to the same structure later (Nitesh). The prompt is
+**The three-part prompt.** The landing page shows a sample; the backend's `buildPrompt` now uses the same structure for signed-in students. The prompt is
 assembled, never generated, in three parts:
 
 1. **Known:** what the map says.

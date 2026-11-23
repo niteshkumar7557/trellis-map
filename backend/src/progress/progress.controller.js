@@ -145,8 +145,7 @@ async function loadPromptContext(userId, topicId) {
   const statusById = Object.fromEntries(
     progressRows.map((p) => [p.topicId, p.status])
   );
-  const userTopicProgress = progressRows.find((p) => p.topicId === topic.id);
-  const note = userTopicProgress?.note ?? null;
+  const noteById = Object.fromEntries(progressRows.filter((p) => p.note).map((p) => [p.topicId, p.note]));
   const topicStatus = statusById[topic.id] ?? "NOT_STARTED";
 
   let hint = null;
@@ -161,7 +160,7 @@ async function loadPromptContext(userId, topicId) {
     topic,
     prereqs,
     statusById,
-    note,
+    noteById,
     hint,
   });
 
