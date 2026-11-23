@@ -74,7 +74,7 @@ export default function MapPage({ user, selectedSubjectId }) {
       </main>
     );
   }
-  if (!subject) return <p className="center muted">Loading the map…</p>;
+  if (!subject) return <p className="center muted">Loading topic map…</p>;
 
   const topicsById = Object.fromEntries(topics.map((t) => [t.id, t]));
   const selected = topicsById[selectedId];
@@ -83,14 +83,19 @@ export default function MapPage({ user, selectedSubjectId }) {
   const doneCount = topicsWith("DONE").length;
   const firstName = user.name.split(" ")[0];
 
-  // Group topics into rows by level. They arrive in learning order already.
+  // Group topics into rows by level for the active subject map.
   const levels = [];
   for (const topic of topics) {
-    (levels[topic.level] ??= []).push(topic);
+    if (topic.level !== undefined && topic.level !== null) {
+      (levels[topic.level] ??= []).push(topic);
+    }
   }
 
   return (
-    <main className={selected ? "page map-layout has-panel" : "page map-layout"}>
+    <main
+      className={selected ? "page map-layout has-panel" : "page map-layout"}
+      data-subject={subject.slug}
+    >
       <div className="title-row">
         <div>
           <div className="map-subject-badge" aria-label={`Current subject: ${subject.name}`}>
@@ -156,6 +161,7 @@ export default function MapPage({ user, selectedSubjectId }) {
 
         <ol className="trellis">
           {levels.map((row, level) => {
+            if (!row || row.length === 0) return null;
             const rowDone = row.every((t) => statusOf(t) === "DONE");
             return (
               <li key={level} className={rowDone ? "trellis-row is-done" : "trellis-row"}>
