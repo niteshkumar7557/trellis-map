@@ -42,7 +42,15 @@ AI feature summarizes saved notes and can rewrite the prompt; it never explains 
    "needs" links between them, loaded by a repeatable seed script.
 4. Subject switcher allowing students and admins to choose between subjects.
 5. Topics shown in learning order (grouped by level).
-6. A status on each topic: Not started, Learning, Done, Stuck. Plus a short note.
+6. A status on each topic: Not started, Learning, Done, Stuck. Plus a short note, which the
+   topic panel shows once saved, with Edit and Delete (Delete asks first). Deleting sends
+   `note: null` to `PUT /api/progress/:topicId`; changing the status leaves the note alone.
+   Learning and Done are allowed only once every "Needs first" topic is Done; otherwise a
+   pop-up names the topics to finish first. The status also only moves forward: Not started
+   → Learning, Stuck or Done; Learning → Stuck or Done; Stuck → Learning or Done; Done is
+   final (`NEXT_STATUSES` in `frontend/src/statuses.js`). Options not allowed from the
+   current status are faded and disabled (no pop-up). Both checks are in the
+   frontend only (`TopicPanel`); the API does not enforce them.
 7. The next topic.
 8. The stuck hint.
 9. The prompt, built from a template and AI summaries of saved notes when available, with a Copy button.

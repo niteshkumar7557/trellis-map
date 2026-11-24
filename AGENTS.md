@@ -95,6 +95,14 @@ adds `gsap` and `@gsap/react`. `docs/design.md` §16 describes the three-part pr
 uses the three-part structure. Groq summarizes the current note and up to two completed
 prerequisite notes, with the original notes as fallback. See `docs/design.md` §8 and §16.
 
+**Saved notes (24 Nov 2026), branch `feat/note-view-delete`:** the topic panel shows the
+saved note with Edit and Delete (with a confirm step). Frontend only; it uses the existing
+`PUT /api/progress/:topicId` (`note: null` deletes). Status buttons no longer resend the note.
+Learning and Done need every "Needs first" topic Done (a pop-up says which), and the status
+only moves forward (Done is final, nothing returns to Not started); both frontend only, not
+enforced by the API. The whole prompt shows (no scroll boxes) and topic boxes have more
+space so their rings don't touch.
+
 **Next:** the viva deadline has been extended, so the team will add new features. Add each
 feature to `docs/design.md` (what it does, its routes and fields, who owns it) before
 building it, on that owner's branch.

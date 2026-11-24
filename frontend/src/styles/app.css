@@ -258,14 +258,11 @@
   /* Map section: column 1, row 5 — never moves */
   .map-layout > .map { grid-column: 1; grid-row: 5; }
 
-  /* Topic panel: column 2, same row 5 — sticky beside the map */
+  /* Topic panel: column 2, same row 5, beside the map. No scroll box of its own,
+     so the whole prompt shows and the page is the only thing that scrolls. */
   .map-layout.has-panel > .topic-panel {
     grid-column: 2;
     grid-row: 5;
-    position: sticky;
-    top: 16px;
-    max-height: calc(100vh - 32px);
-    overflow-y: auto;
   }
 }
 
@@ -413,7 +410,7 @@
 .trellis-topics {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 16px; /* room for the rings outside each box (up to 6px), so they never touch */
   margin: 0;
   padding: 0;
   list-style: none;
@@ -635,11 +632,47 @@
   cursor: progress;
 }
 
+/* Not allowed from the current status (it only moves forward): faded and unclickable */
+.segment.is-locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .note-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.note-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* A saved note reads as a quote: a rule on the left, no second card (the prompt is the card) */
+.saved-note {
+  display: grid;
+  gap: 10px;
+}
+
+.saved-note-text {
+  padding-left: 12px;
+  border-left: 2px solid var(--border);
+  font-size: var(--fs-read);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.saved-note-ask {
+  font-size: var(--fs-small);
+}
+
+.btn-ghost.danger:not(:disabled),
+.btn-secondary.danger:not(:disabled) {
+  color: var(--error);
 }
 
 .hint p {
@@ -663,9 +696,8 @@
   gap: 12px;
 }
 
+/* The whole prompt shows: no scroll box inside the card */
 .prompt {
-  max-height: 320px;
-  overflow-y: auto;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -674,6 +706,35 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+/* The pop-up when a status isn't allowed yet (a native <dialog>) */
+.dialog {
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sheet);
+  background: var(--raised);
+  color: var(--text);
+}
+
+.dialog::backdrop {
+  background: rgb(0 0 0 / 0.4);
+}
+
+.dialog h2 {
+  margin-bottom: 8px;
+  font-size: 1.125rem;
+}
+
+.dialog p {
+  margin-bottom: 20px;
+  font-size: var(--fs-read);
+}
+
+.dialog form {
+  display: flex;
+  justify-content: flex-end;
 }
 
 /* ---- Login and sign up ---- */

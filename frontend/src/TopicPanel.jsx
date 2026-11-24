@@ -1,12 +1,25 @@
 import { useEffect, useRef, useState } from "react";
 import { apiFetch } from "./api.js";
-import { STATUS_LABELS } from "./statuses.js";
+import { NEXT_STATUSES, STATUS_LABELS } from "./statuses.js";
 import { CloseIcon } from "./ui.jsx";
 
 // Opens beside the map when a topic is clicked. It never explains the topic itself:
 // it builds a prompt for the student's own AI.
-export default function TopicPanel({ topic, subject, topicsById, status, note, onSaved, onClose }) {
+export default function TopicPanel({
+  topic,
+  subject,
+  topicsById,
+  status,
+  note,
+  needsNotDone,
+  onSaved,
+  onClose,
+}) {
   const [noteDraft, setNoteDraft] = useState(note ?? "");
+  const [editing, setEditing] = useState(false); // editing a saved note
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [blocked, setBlocked] = useState(null); // { title, text } for the pop-up, or null
+  const dialogRef = useRef(null);
   const [prompt, setPrompt] = useState("");
   const [hint, setHint] = useState(null);
   const [aiMessage, setAiMessage] = useState("");
@@ -27,26 +40,75 @@ export default function TopicPanel({ topic, subject, topicsById, status, note, o
   // Once, when the panel opens. Each topic gets a fresh panel (a new key).
   useEffect(() => {
     loadPrompt().catch((err) => setError(err.message));
-    // On a narrow screen the panel is below the whole map, so bring it into view.
-    if (window.matchMedia("(max-width: 63.99rem)").matches) {
+    // The panel sits at the top of the map (below it on a narrow screen), so a topic
+    // clicked further down would open it off screen. Bring its top into view.
+    const top = panelRef.current.getBoundingClientRect().top;
+    if (top < 0 || top > window.innerHeight - 100) {
       panelRef.current.scrollIntoView({ block: "start" });
     }
   }, []);
 
-  async function save(newStatus) {
-    setBusy("save");
+  // Open the pop-up when a status is blocked. The <dialog> calls onClose on OK or Escape.
+  useEffect(() => {
+    if (blocked) dialogRef.current.showModal();
+  }, [blocked]);
+
+  // Both rules are in the page only (the API allows any status). The status only moves
+  // forward (NEXT_STATUSES), so the other options are simply disabled. And Learning and
+  // Done need every topic this one needs to be Done, which gets a pop-up. Stuck is always
+  // allowed: being stuck is how the stuck hint finds a weak earlier topic.
+  function chooseStatus(newStatus) {
+    if (newStatus === status) return; // already there, nothing to save
+
+    if ((newStatus === "LEARNING" || newStatus === "DONE") && needsNotDone.length > 0) {
+      setBlocked({
+        title: "Finish what it needs first",
+        text: `To mark ${topic.name} as ${STATUS_LABELS[newStatus]}, first mark ${needsNotDone.join(", ")} as Done.`,
+      });
+      return;
+    }
+
+    save({ status: newStatus }, "status");
+  }
+
+  // One PUT for every change. A body without `note` keeps the saved note, so changing
+  // the status never touches it.
+  async function save(changes, kind) {
+    setBusy(kind);
     setError("");
     try {
       await apiFetch(`/api/progress/${topic.id}`, {
         method: "PUT",
-        body: { status: newStatus, note: noteDraft.trim() || null },
+        body: { status, ...changes },
       });
       await Promise.all([onSaved(), loadPrompt()]);
+      return true;
     } catch (err) {
       setError(err.message);
+      return false;
     } finally {
       setBusy("");
     }
+  }
+
+  async function saveNote() {
+    const text = noteDraft.trim();
+    if (await save({ note: text }, "save")) {
+      setNoteDraft(text);
+      setEditing(false);
+    }
+  }
+
+  async function deleteNote() {
+    if (await save({ note: null }, "delete")) {
+      setNoteDraft("");
+      setConfirmDelete(false);
+    }
+  }
+
+  function cancelEdit() {
+    setNoteDraft(note);
+    setEditing(false);
   }
 
   async function improve() {
@@ -113,41 +175,92 @@ export default function TopicPanel({ topic, subject, topicsById, status, note, o
       <div className="panel-block">
         <h3 id="status-label">Where you are</h3>
         <div className="segmented" role="group" aria-labelledby="status-label">
-          {Object.entries(STATUS_LABELS).map(([value, label]) => (
-            <button
-              key={value}
-              className="segment"
-              aria-pressed={status === value}
-              disabled={busy !== ""}
-              onClick={() => save(value)}
-            >
-              <span className={`dot status-${value}`} aria-hidden="true" />
-              {label}
-            </button>
-          ))}
+          {Object.entries(STATUS_LABELS).map(([value, label]) => {
+            const locked = status !== value && !NEXT_STATUSES[status].includes(value);
+            return (
+              <button
+                key={value}
+                className={locked ? "segment is-locked" : "segment"}
+                aria-pressed={status === value}
+                disabled={busy !== "" || locked}
+                onClick={() => chooseStatus(value)}
+              >
+                <span className={`dot status-${value}`} aria-hidden="true" />
+                {label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       <div className="panel-block">
-        <label className="field">
-          Your note
-          <textarea
-            rows={3}
-            maxLength={500}
-            value={noteDraft}
-            onChange={(e) => setNoteDraft(e.target.value)}
-            placeholder="What's confusing you? It goes into the prompt."
-            aria-describedby="note-count"
-          />
-        </label>
-        <div className="note-row">
-          <button className="btn-secondary" disabled={busy !== ""} onClick={() => save(status)}>
-            {busy === "save" ? "Saving…" : "Save note"}
-          </button>
-          <span className="field-hint num" id="note-count">
-            {noteDraft.length} / 500
-          </span>
-        </div>
+        <h3 id="note-label">Your note</h3>
+        {/* No saved note yet, or the student pressed Edit: show the box. */}
+        {editing || !note ? (
+          <>
+            <textarea
+              rows={3}
+              maxLength={500}
+              value={noteDraft}
+              onChange={(e) => setNoteDraft(e.target.value)}
+              placeholder="What's confusing you? It goes into the prompt."
+              aria-labelledby="note-label"
+              aria-describedby="note-count"
+              autoFocus={editing}
+            />
+            <div className="note-row">
+              <div className="note-actions">
+                <button
+                  className="btn-secondary"
+                  disabled={busy !== "" || !noteDraft.trim()}
+                  onClick={saveNote}
+                >
+                  {busy === "save" ? "Saving…" : "Save note"}
+                </button>
+                {editing && (
+                  <button className="btn-ghost" disabled={busy !== ""} onClick={cancelEdit}>
+                    Cancel
+                  </button>
+                )}
+              </div>
+              <span className="field-hint num" id="note-count">
+                {noteDraft.length} / 500
+              </span>
+            </div>
+          </>
+        ) : (
+          <div className="saved-note">
+            <p className="saved-note-text">{note}</p>
+            {confirmDelete ? (
+              <div className="note-actions">
+                <span className="saved-note-ask">Delete this note?</span>
+                <button className="btn-secondary danger" disabled={busy !== ""} onClick={deleteNote}>
+                  {busy === "delete" ? "Deleting…" : "Delete"}
+                </button>
+                <button
+                  className="btn-ghost"
+                  disabled={busy !== ""}
+                  onClick={() => setConfirmDelete(false)}
+                >
+                  Keep it
+                </button>
+              </div>
+            ) : (
+              <div className="note-actions">
+                <button className="btn-secondary" disabled={busy !== ""} onClick={() => setEditing(true)}>
+                  Edit
+                </button>
+                <button
+                  className="btn-ghost danger"
+                  disabled={busy !== ""}
+                  onClick={() => setConfirmDelete(true)}
+                >
+                  Delete
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {status === "STUCK" && (
@@ -186,6 +299,19 @@ export default function TopicPanel({ topic, subject, topicsById, status, note, o
           {error}
         </p>
       )}
+
+      <dialog
+        ref={dialogRef}
+        className="dialog"
+        aria-labelledby="blocked-title"
+        onClose={() => setBlocked(null)}
+      >
+        <h2 id="blocked-title">{blocked?.title}</h2>
+        <p>{blocked?.text}</p>
+        <form method="dialog">
+          <button className="btn">OK</button>
+        </form>
+      </dialog>
     </aside>
   );
 }

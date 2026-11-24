@@ -201,6 +201,10 @@ export default function MapPage({ user, selectedSubjectId }) {
           topicsById={topicsById}
           status={statusOf(selected)}
           note={noteById[selected.id] ?? ""}
+          needsNotDone={selected.needs
+            .filter((id) => statusById[id] !== "DONE")
+            .map((id) => topicsById[id]?.name)
+            .filter(Boolean)}
           onSaved={() => loadProgress(selectedSubjectId ?? subject.id)}
           onClose={() => setSelectedId(null)}
         />
