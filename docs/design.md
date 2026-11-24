@@ -634,7 +634,7 @@ it, worked out live on a sample student.
 | Section | What it shows |
 |---|---|
 | Hero | "The map of what you're learning." The subject's topics in learning order, one row per step, with the sample student's statuses and the next topic marked. A switcher picks one of the subjects. Pointing at a topic shows its summary, its status, what it needs, and whether it's next |
-| Stuck | "Stuck is traced, not guessed." The sample student is stuck on Promises. The trace runs one step down to the topics Promises needs, shows each one's status, and names the weakest first (§8: not started, then stuck, then learning) |
+| Stuck | "Stuck points back down the map." The sample student is stuck on Promises. The trace runs one step down to the topics Promises needs, shows each one's status, clears the Done ones and names one as "may be why" (§8: not started, then stuck, then learning; the earliest on a tie). The copy says it is a hint from a fixed rule, and what the app says when everything underneath is Done |
 | Prompt | "Your AI teaches. Trellis writes the prompt." The prompt for that stuck topic in its **three parts** (below), each lit on hover from its source, a working Copy button, and one line saying the AI only summarizes saved notes |
 | Subjects | Every subject as a miniature of its map, with its topic and step counts. Each links to sign-up |
 | What it won't do | Five promises (teach, nag, judge, tell, forget) beside an espalier drawing that turns through the seasons |

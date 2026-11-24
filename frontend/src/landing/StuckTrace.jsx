@@ -3,7 +3,7 @@
 //   1. the stuck topic and what they wrote about it;
 //   2. the trace running one step down the map, to each topic it needs;
 //   3. how far they got with each one;
-//   4. the one the rule names first: "May be why".
+//   4. the one topic the rule names: "May be why".
 //
 // The topics, their statuses and the answer all come from the backend's findStuckHint, via
 // ./sample.js. Only where each box sits in this small drawing is decided here.
@@ -81,15 +81,20 @@ export function StuckTrace({ stuck }) {
     <section ref={root} className="l-stuck" aria-labelledby="stuck-title">
       <div className="l-stuck-text">
         <h2 id="stuck-title" className="l-h2">
-          Stuck is traced, not guessed
+          Stuck points back down the map
         </h2>
-        <p data-step>You mark {name} as stuck. That is the most useful thing you can tell it.</p>
         <p data-step>
-          Trellis looks one step down the map, at the topics {name} needs, and at how far you got with each one.
+          You mark {name} as Stuck, with a note on what went wrong if you like. The note goes into your prompt; the hint
+          comes from the map.
         </p>
         <p data-step>
-          The weakest footing is named first: never started, then stuck, then still learning. Your prompt starts there.
-          It is a fixed rule you can read, never an AI&apos;s opinion.
+          Trellis checks the topics {name} needs first, one step down the map, and how far you got with each. The ones
+          you&apos;ve finished are cleared.
+        </p>
+        <p data-step>
+          Of the rest it names one: a topic you haven&apos;t started, then one you&apos;re stuck on too, then one
+          you&apos;re still learning, the earliest first on a tie. It says this <em>may be</em> why, from a fixed rule,
+          not an AI, and your prompt starts there. If everything underneath is Done, it says so instead.
         </p>
       </div>
 
