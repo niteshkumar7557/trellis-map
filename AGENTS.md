@@ -34,6 +34,9 @@ prompt, AI), the 15 topics, `.env`, tests, the git workflow and who built what.
 
 If code and the doc disagree, fix one of them in the same change.
 
+`README.md` is only the GitHub front page: what Trellis is, the live link, how to run it,
+and a pointer to `docs/design.md`. Keep it short and in step with the doc.
+
 ## Rules for every agent
 
 - **JavaScript only**, ES modules (`import`/`export`). No TypeScript.
