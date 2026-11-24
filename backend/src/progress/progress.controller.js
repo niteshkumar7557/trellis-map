@@ -5,7 +5,6 @@ import { getSortedTopics } from "../topics/topics.service.js";
 import { findNextTopic } from "./findNextTopic.js";
 import { findStuckHint } from "./findStuckHint.js";
 import { buildPrompt } from "./buildPrompt.js";
-import { improvePrompt } from "./improvePrompt.js";
 import { summarizeNotes } from "./summarizeNotes.js";
 
 export const updateProgressSchema = z.object({
@@ -178,14 +177,4 @@ export async function getPrompt(req, res) {
 
   const { prompt, hint } = await loadPromptContext(userId, topicId);
   res.json({ prompt, hint });
-}
-
-// POST /api/topics/:id/prompt/improve
-export async function improveTopicPrompt(req, res) {
-  const topicId = Number(req.params.id);
-  const userId = req.user.id;
-
-  const { prompt } = await loadPromptContext(userId, topicId);
-  const result = await improvePrompt(prompt);
-  res.json(result);
 }

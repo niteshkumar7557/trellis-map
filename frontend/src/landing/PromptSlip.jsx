@@ -60,8 +60,8 @@ export function PromptSlip({ stuck }) {
           ))}
         </ul>
         <p className="l-prompt-ai" data-rise>
-          Want it in your own words? <strong>Improve with AI</strong> asks a model to rewrite it for you. If the AI is busy,
-          you keep this one.
+          The only AI Trellis uses: your saved notes are summarized briefly before they go in. If the
+          AI is busy, your own words go in instead.
         </p>
       </div>
 

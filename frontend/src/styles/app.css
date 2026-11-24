@@ -689,13 +689,6 @@
   background: var(--raised);
 }
 
-.prompt-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-}
-
 /* The whole prompt shows: no scroll box inside the card */
 .prompt {
   white-space: pre-wrap;

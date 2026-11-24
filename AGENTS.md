@@ -11,8 +11,8 @@ end-of-semester viva.
 - It shows the topics of **JavaScript fundamentals**, **Node.js fundamentals**,
   **MongoDB fundamentals** and **React fundamentals** in learning order and the next topic.
 - When a topic is marked Stuck, it says which earlier topic "may be" the cause.
-- It builds a prompt for the student's own AI, with an optional "Improve with AI" through
-  Groq.
+- It builds a prompt for the student's own AI. Its only use of AI is internal: Groq briefly
+  summarizes the student's saved notes for that prompt.
 - **It never explains topics itself.**
 
 There are four people, each owning one backend part. The examiners ask only about the
@@ -102,6 +102,10 @@ Learning and Done need every "Needs first" topic Done (a pop-up says which), and
 only moves forward (Done is final, nothing returns to Not started); both frontend only, not
 enforced by the API. The whole prompt shows (no scroll boxes) and topic boxes have more
 space so their rings don't touch.
+
+**Improve with AI removed (24 Nov 2026), branch `fix/remove-improve-with-ai`:** the button,
+`POST /api/topics/:id/prompt/improve`, `improvePrompt` and its tests, and the AI rate
+limiter are gone. AI is used only by `summarizeNotes`.
 
 **Next:** the viva deadline has been extended, so the team will add new features. Add each
 feature to `docs/design.md` (what it does, its routes and fields, who owns it) before

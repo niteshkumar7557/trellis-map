@@ -22,9 +22,8 @@ export default function TopicPanel({
   const dialogRef = useRef(null);
   const [prompt, setPrompt] = useState("");
   const [hint, setHint] = useState(null);
-  const [aiMessage, setAiMessage] = useState("");
   const [copied, setCopied] = useState(false);
-  const [busy, setBusy] = useState(""); // "save", "improve" or ""
+  const [busy, setBusy] = useState(""); // "status", "save", "delete" or ""
   const [error, setError] = useState("");
   const panelRef = useRef(null);
 
@@ -34,7 +33,6 @@ export default function TopicPanel({
     const data = await apiFetch(`/api/topics/${topic.id}/prompt`);
     setPrompt(data.prompt);
     setHint(data.hint);
-    setAiMessage("");
   }
 
   // Once, when the panel opens. Each topic gets a fresh panel (a new key).
@@ -109,20 +107,6 @@ export default function TopicPanel({
   function cancelEdit() {
     setNoteDraft(note);
     setEditing(false);
-  }
-
-  async function improve() {
-    setBusy("improve");
-    setError("");
-    try {
-      const data = await apiFetch(`/api/topics/${topic.id}/prompt/improve`, { method: "POST" });
-      setPrompt(data.prompt);
-      setAiMessage(data.improved ? "Improved by AI." : "The AI is busy, here's the basic prompt.");
-    } catch (err) {
-      setError(err.message); // for example the rate limit
-    } finally {
-      setBusy("");
-    }
   }
 
   async function copy() {
@@ -276,21 +260,11 @@ export default function TopicPanel({
       )}
 
       <div className="prompt-card">
-        <div className="prompt-head">
-          <h3>Prompt for your AI</h3>
-          {aiMessage && (
-            <span className="field-hint" role="status">
-              {aiMessage}
-            </span>
-          )}
-        </div>
+        <h3>Prompt for your AI</h3>
         <p className={prompt ? "prompt" : "prompt muted"}>{prompt || "Building the prompt…"}</p>
         <div className="prompt-actions">
           <button className="btn" onClick={copy} disabled={!prompt}>
             {copied ? "Copied" : "Copy prompt"}
-          </button>
-          <button className="btn-secondary" onClick={improve} disabled={!prompt || busy !== ""}>
-            {busy === "improve" ? "Improving…" : "Improve with AI"}
           </button>
         </div>
       </div>

@@ -23,12 +23,12 @@ Trellis knows which topic **needs** which, so it can:
 - when you mark a topic **Stuck**, say "this may be because of *Callbacks*": an earlier
   topic you haven't finished;
 - build a **prompt** for your own AI (ChatGPT, Claude, anything) that says what you know,
-  what you don't and what you wrote down, and asks it to teach in small steps;
-- optionally have an AI **improve that prompt** for you.
+  what you don't and what you wrote down, and asks it to teach in small steps.
 
 **The one rule: Trellis never teaches.** Explanations are free everywhere. Trellis does the
-part a chat AI can't: it knows the shape of the subject and where you are in it. Even the
-AI feature summarizes saved notes and can rewrite the prompt; it never explains the topic.
+part a chat AI can't: it knows the shape of the subject and where you are in it. Its only
+use of AI is internal: Groq briefly summarizes saved notes for the prompt. It never
+explains the topic.
 
 ## 2. What's in, what's out
 
@@ -54,11 +54,9 @@ AI feature summarizes saved notes and can rewrite the prompt; it never explains 
 7. The next topic.
 8. The stuck hint.
 9. The prompt, built from a template and AI summaries of saved notes when available, with a Copy button.
-10. "Improve with AI": one Groq call that rewrites the prompt; falls back to the template if
-    the AI fails.
-11. An admin role: admins can add and edit topics. Students can't.
-12. Rate limiting on login and on the AI route.
-13. Unit tests (Vitest) for every part.
+10. An admin role: admins can add and edit topics. Students can't.
+11. Rate limiting on login.
+12. Unit tests (Vitest) for every part.
 
 **Out (on purpose):** a chat, quizzes, explanations, third-party subjects beyond JS,
 Node.js, MongoDB, and React, topics inside topics, password reset, email, deleting your account, deployment. The
@@ -342,7 +340,6 @@ All of these need sign-in, and every query is limited to `req.user.id`.
 | `PUT /api/progress/:topicId` | `{ status, note? }` | `{ progress, hint }`; `hint` is set when the status is `STUCK` |
 | `GET /api/subjects/:id/next` | | `{ next: topic or null }` (`null` means every topic is done) |
 | `GET /api/topics/:id/prompt` | | `{ prompt, hint }` |
-| `POST /api/topics/:id/prompt/improve` | | `{ prompt, improved }`, **rate limited**. `improved: false` means the AI failed and this is the template prompt |
 
 ## 8. The rules, exactly
 
@@ -367,25 +364,17 @@ AI's opinion, so we can always explain why it said what it said.
 
 **The prompt** (`buildPrompt`) uses the three-part structure in §16. The controller loads the current topic and its prerequisites, statuses, and notes. `summarizeNotes` sends the current note and up to two notes from completed prerequisites to Groq in one request, then caches summaries by note text. If the key is missing, Groq fails, or the response is invalid, the original notes are used. `buildPrompt` combines these notes with map context and fixed instructions. It does not call AI itself.
 
-**Improve with AI** (`improvePrompt`): send the template prompt to Groq.
-
-- The system message: "You rewrite study prompts so they are clearer and more specific to
-  this student. Keep every fact in the prompt. Return only the new prompt. Never explain
-  the topic yourself."
-- `temperature: 0.4`, and an 8-second timeout (`AbortSignal.timeout(8000)`).
-- If anything goes wrong, return the template with `improved: false`: a network error, a
-  non-200 answer, an empty reply, or the timeout. The page says "The AI is busy, here's the
-  basic prompt." The feature can fail without breaking anything.
+"Improve with AI" (a Groq rewrite of the whole prompt) was removed on 24 Nov 2026: the
+only AI use is the note summaries above.
 
 **Rate limits** (`express-rate-limit`):
 
 | What | Limit | Key |
 |---|---|---|
 | Login | 10 tries per 15 minutes | IP address |
-| AI improve | 10 per 15 minutes | user id |
 
-Groq's free tier is one key shared by everyone, so the AI limit stops one student using it
-all up.
+Groq is not rate limited per user: it is only called for a note whose text has no cached
+summary yet, so it runs about once per saved or changed note.
 
 ## 9. The subjects
 
@@ -502,7 +491,7 @@ and no internet. Run them with `npm test` (which is `vitest run`) inside `backen
 | 1 | `sortTopics` orders topics, gives the right levels, and catches a loop (tested for JS, Node.js, and React); the error handler sends the right status and shape; `seedGraph.test.js` verifies topic graph validity, acyclicity, and repeatable seeding across all subjects (JS, Node.js, MongoDB, React) |
 | 2 | hash then check a password; sign then check a token; `requireAuth` (no token, bad token, good token); `requireAdmin` (student gets 403, admin passes) |
 | 3 | `checkRefreshToken` refuses used and expired tokens; `findOrCreateGoogleUser` with a fake database: existing Google user, existing email, new user |
-| 4 | `findNextTopic`, `findStuckHint` and `buildPrompt` across topics; `improvePrompt` with a faked `fetch`: success, error and timeout |
+| 4 | `findNextTopic`, `findStuckHint` and `buildPrompt` across topics; `summarizeNotes` with a faked `fetch`: success, cache and fallback |
 
 How code is written so it can be tested:
 
@@ -553,7 +542,7 @@ person's commits show on GitHub under their name.
 - **Access tokens:** 15-minute JWTs signed and checked (`tokens.js`).
 - **`requireAuth`** (401 without a valid token) and **`requireAdmin`** (403 for students).
 - **The routes:** `POST /api/auth/signup`, `POST /api/auth/login`, `GET /api/me`.
-- **Rate limits** on login and on the AI route (`rateLimits.js`), and
+- **Rate limit** on login (`rateLimits.js`), and
   **`npm run make-admin`** (`scripts/make-admin.js`).
 - **Tests:** passwords, tokens, `requireAuth`, `requireAdmin`.
 
@@ -578,11 +567,10 @@ person's commits show on GitHub under their name.
 - **`findNextTopic`:** the first unfinished topic whose prerequisites are all done.
 - **`findStuckHint`:** the earlier topic that "may be" why the student is stuck.
 - **`buildPrompt`:** the study prompt from the template in §8.
-- **`improvePrompt`:** one Groq call through `fetch`, falling back to the template if it
-  fails or takes over 8 seconds.
-- **The routes:** progress, next topic, prompt and "Improve with AI" (behind Riya's
-  per-user AI rate limit), each behind `requireAuth`.
-- **Tests:** all four functions; `improvePrompt` with a faked `fetch`.
+- **`summarizeNotes`:** one Groq call through `fetch` that briefly summarizes the saved
+  notes in the prompt, falling back to the original notes if it fails.
+- **The routes:** progress, next topic and prompt, each behind `requireAuth`.
+- **Tests:** all four functions; `summarizeNotes` with a faked `fetch`.
 
 ## 14. Where this falls short of production
 
@@ -647,7 +635,7 @@ it, worked out live on a sample student.
 |---|---|
 | Hero | "The map of what you're learning." The subject's topics in learning order, one row per step, with the sample student's statuses and the next topic marked. A switcher picks one of the subjects. Pointing at a topic shows its summary, its status, what it needs, and whether it's next |
 | Stuck | "Stuck is traced, not guessed." The sample student is stuck on Promises. The trace runs one step down to the topics Promises needs, shows each one's status, and names the weakest first (§8: not started, then stuck, then learning) |
-| Prompt | "Your AI teaches. Trellis writes the prompt." The prompt for that stuck topic in its **three parts** (below), each lit on hover from its source, a working Copy button, and one line on "Improve with AI" |
+| Prompt | "Your AI teaches. Trellis writes the prompt." The prompt for that stuck topic in its **three parts** (below), each lit on hover from its source, a working Copy button, and one line saying the AI only summarizes saved notes |
 | Subjects | Every subject as a miniature of its map, with its topic and step counts. Each links to sign-up |
 | What it won't do | Five promises (teach, nag, judge, tell, forget) beside an espalier drawing that turns through the seasons |
 | Start | One card: "Start your map", to sign-up, and a link to log in |

@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { requireAuth } from "../auth/requireAuth.js";
-import { aiLimiter } from "../auth/rateLimits.js";
 import { validateBody } from "../middleware/validate.js";
 import {
   getProgress,
@@ -8,7 +7,6 @@ import {
   updateProgressSchema,
   getNextTopic,
   getPrompt,
-  improveTopicPrompt,
 } from "./progress.controller.js";
 
 export const progressRouter = Router();
@@ -23,4 +21,3 @@ progressRouter.put(
 );
 progressRouter.get("/subjects/:id/next", requireAuth, getNextTopic);
 progressRouter.get("/topics/:id/prompt", requireAuth, getPrompt);
-progressRouter.post("/topics/:id/prompt/improve", requireAuth, aiLimiter, improveTopicPrompt);

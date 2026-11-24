@@ -508,7 +508,6 @@
   margin: 28px 0 0;
   color: var(--l-soft);
 }
-.l-prompt-ai strong { color: var(--l-ink); font-weight: 600; }
 
 .l-slip {
   grid-column: 7 / 13;
