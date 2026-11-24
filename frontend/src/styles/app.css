@@ -732,6 +732,13 @@
 
 /* ---- Login and sign up ---- */
 
+/* Google's "G", sized like the other icons in buttons */
+.google-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
 .auth-page {
   min-height: 100vh;
   display: flex;

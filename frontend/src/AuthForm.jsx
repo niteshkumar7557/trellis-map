@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { login, signup } from "./api.js";
-import { Brand, ThemeToggle } from "./ui.jsx";
+import { Brand, GoogleIcon, ThemeToggle } from "./ui.jsx";
 
 // The Login and Sign up screens. They differ only in the name field and the wording.
 export default function AuthForm({ mode, onSignedIn }) {
@@ -112,6 +112,7 @@ export default function AuthForm({ mode, onSignedIn }) {
 
           {/* A plain link, not fetch: the browser itself must go to Google and back. */}
           <a className="btn-secondary auth-google" href="/api/auth/google">
+            <GoogleIcon />
             Continue with Google
           </a>
 
